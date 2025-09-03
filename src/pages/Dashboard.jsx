@@ -85,60 +85,16 @@ const Dashboard = () => {
   ]
 
   return (
-    <div className="space-y-6">
-      {/* Enhanced Header */}
+    <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
-          <p className="text-gray-400 mt-1">Real-time market insights and portfolio overview</p>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          {/* Connection Status */}
-          <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg border ${
-            connectionStatus.checking 
-              ? 'border-yellow-500/30 bg-yellow-500/10'
-              : connectionStatus.connected 
-                ? 'border-green-500/30 bg-green-500/10' 
-                : 'border-red-500/30 bg-red-500/10'
-          }`}>
-            {connectionStatus.checking ? (
-              <Clock className="h-4 w-4 text-yellow-400" />
-            ) : connectionStatus.connected ? (
-              <Wifi className="h-4 w-4 text-green-400" />
-            ) : (
-              <WifiOff className="h-4 w-4 text-red-400" />
-            )}
-            <span className={`text-sm font-medium ${
-              connectionStatus.checking 
-                ? 'text-yellow-400'
-                : connectionStatus.connected 
-                  ? 'text-green-400' 
-                  : 'text-red-400'
-            }`}>
-              {connectionStatus.checking 
-                ? 'Checking...'
-                : connectionStatus.connected 
-                  ? 'Connected' 
-                  : 'Offline'
-              }
-            </span>
-          </div>
-
-          <div className="bg-gray-800/50 px-4 py-2 rounded-lg border border-gray-700/50 backdrop-blur-sm">
+        <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+        <div className="flex space-x-4">
+          <div className="bg-gray-800 px-4 py-2 rounded-lg">
             <span className="text-gray-400 text-sm">Last Updated</span>
             <div className="text-white font-medium">
               {new Date().toLocaleTimeString()}
             </div>
           </div>
-
-          <button
-            onClick={handleRefreshData}
-            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
-            title="Refresh data"
-          >
-            <RefreshCw className="h-5 w-5" />
-          </button>
         </div>
       </div>
 

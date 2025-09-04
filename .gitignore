@@ -173,7 +173,7 @@ final_test.py
 test_api.py
 
 # Plotly generated files
-*.html
+backend/*.html
 
 # Temporary analysis files
 analysis_*.py

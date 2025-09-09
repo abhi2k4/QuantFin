@@ -7,12 +7,16 @@ import asyncio
 import aiohttp
 from fastapi import HTTPException
 import os
+import math
 
 try:
     from app.utils.config import get_settings
+    from app.utils.json_encoder import clean_data_for_json
 except ImportError:
     def get_settings(): 
         return type('Settings', (), {})()  # Simple mock settings
+    def clean_data_for_json(data):
+        return data  # Fallback if import fails
 
 class DataService:
     """Service for fetching and managing financial data"""
@@ -45,14 +49,40 @@ class DataService:
             if hist.empty or len(hist) == 0:
                 raise Exception("No data received from Yahoo Finance")
             
+            # Clean the data and handle NaN/Inf values
+            hist_clean = hist.reset_index()
+            
+            # Replace NaN and infinite values
+            hist_clean = hist_clean.replace([np.inf, -np.inf], np.nan)
+            hist_clean = hist_clean.fillna(method='ffill').fillna(0)
+            
+            # Convert to records and clean
+            data_records = hist_clean.to_dict('records')
+            cleaned_records = clean_data_for_json(data_records)
+            
+            # Clean info data
+            cleaned_info = {}
+            if info:
+                for key, value in info.items():
+                    if isinstance(value, (int, float)):
+                        if math.isnan(value) if isinstance(value, float) else False:
+                            cleaned_info[key] = None
+                        elif math.isinf(value) if isinstance(value, float) else False:
+                            cleaned_info[key] = None
+                        else:
+                            cleaned_info[key] = value
+                    else:
+                        cleaned_info[key] = value
+            
             return {
                 "symbol": symbol,
-                "data": hist.reset_index().to_dict('records'),
-                "info": info,
+                "data": cleaned_records,
+                "info": cleaned_info,
                 "last_updated": datetime.now().isoformat(),
                 "data_source": "yahoo_finance"
             }
         except Exception as e:
+            print(f"Failed to get ticker '{symbol}' reason: {str(e)}")
             # Always use fallback if any error occurs
             return self._get_mock_stock_data(symbol, period)
     
@@ -189,36 +219,50 @@ class DataService:
     def calculate_technical_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
         """Calculate technical indicators"""
         df = data.copy()
-        # ensure numeric dtype (coerce non-numeric -> NaN) and use a local float Series
+        
+        # Ensure numeric dtype and handle NaN values
         df['Close'] = pd.to_numeric(df['Close'], errors='coerce')
+        df['High'] = pd.to_numeric(df['High'], errors='coerce')
+        df['Low'] = pd.to_numeric(df['Low'], errors='coerce')
+        df['Volume'] = pd.to_numeric(df['Volume'], errors='coerce')
+        
+        # Fill NaN values with forward fill then 0
+        df = df.fillna(method='ffill').fillna(0)
+        
         close = df['Close'].astype(float)
         
         # Simple Moving Averages
-        df['SMA_20'] = close.rolling(window=20).mean()
-        df['SMA_50'] = close.rolling(window=50).mean()
+        df['SMA_20'] = close.rolling(window=20, min_periods=1).mean()
+        df['SMA_50'] = close.rolling(window=50, min_periods=1).mean()
         
         # Exponential Moving Averages
-        df['EMA_20'] = close.ewm(span=20).mean()
-        df['EMA_50'] = close.ewm(span=50).mean()
+        df['EMA_20'] = close.ewm(span=20, min_periods=1).mean()
+        df['EMA_50'] = close.ewm(span=50, min_periods=1).mean()
         
         # RSI
         delta = close.diff()
-        gain = delta.clip(lower=0).rolling(window=14).mean()        # no '>' operator
-        loss = (-delta).clip(lower=0).rolling(window=14).mean()     # no '<' operator
-        rs = gain / loss
+        gain = delta.clip(lower=0).rolling(window=14, min_periods=1).mean()
+        loss = (-delta).clip(lower=0).rolling(window=14, min_periods=1).mean()
+        
+        # Avoid division by zero
+        rs = gain / loss.replace(0, np.nan)
         df['RSI'] = 100 - (100 / (1 + rs))
         
         # MACD
-        ema_12 = close.ewm(span=12).mean()
-        ema_26 = close.ewm(span=26).mean()
+        ema_12 = close.ewm(span=12, min_periods=1).mean()
+        ema_26 = close.ewm(span=26, min_periods=1).mean()
         df['MACD'] = ema_12 - ema_26
-        df['MACD_Signal'] = df['MACD'].ewm(span=9).mean()
+        df['MACD_Signal'] = df['MACD'].ewm(span=9, min_periods=1).mean()
         df['MACD_Histogram'] = df['MACD'] - df['MACD_Signal']
         
         # Bollinger Bands
-        df['BB_Middle'] = close.rolling(window=20).mean()
-        bb_std = close.rolling(window=20).std()
+        df['BB_Middle'] = close.rolling(window=20, min_periods=1).mean()
+        bb_std = close.rolling(window=20, min_periods=1).std()
         df['BB_Upper'] = df['BB_Middle'] + (bb_std * 2)
         df['BB_Lower'] = df['BB_Middle'] - (bb_std * 2)
+        
+        # Replace any remaining NaN or inf values
+        df = df.replace([np.inf, -np.inf], np.nan)
+        df = df.fillna(0)
         
         return df

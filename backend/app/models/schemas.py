@@ -85,6 +85,8 @@ class FinancialRatios(BaseModel):
 
 class MLPrediction(BaseModel):
     """ML prediction schema"""
+    model_config = {'protected_namespaces': ()}
+    
     symbol: str
     model_type: str
     predicted_price: float

@@ -24,6 +24,15 @@ class PortfolioService:
         df['Returns'] = df['Close'].pct_change()
         df['Log_Returns'] = np.log(df['Close'] / df['Close'].shift(1))
         
+        # Moving averages
+        df['SMA_5'] = df['Close'].rolling(window=5).mean()
+        df['SMA_20'] = df['Close'].rolling(window=20).mean()
+        df['EMA_12'] = df['Close'].ewm(span=12).mean()
+        df['EMA_26'] = df['Close'].ewm(span=26).mean()
+        
+        # Volatility (rolling standard deviation of returns)
+        df['Volatility'] = df['Returns'].rolling(window=20).std()
+        
         # Lag features
         for lag in [1, 2, 3]:
             df[f'Returns_Lag_{lag}'] = df['Returns'].shift(lag)
@@ -195,9 +204,46 @@ class PortfolioService:
         try:
             print(f"Backtesting {strategy} for {symbol} from {start_date} to {end_date}")
             
-            # Get historical data
-            ticker = yf.Ticker(symbol)
-            data = ticker.history(start=start_date, end=end_date)
+            # Use our improved data service instead of direct yfinance call
+            try:
+                # Try to get data using our robust data service
+                stock_data_response = await self.data_service.get_stock_data(symbol, period="2y")
+                
+                if stock_data_response and 'data' in stock_data_response:
+                    # Convert response to DataFrame
+                    data_records = stock_data_response['data']
+                    data = pd.DataFrame(data_records)
+                    
+                    # Ensure Date column is datetime and set as index
+                    if 'Date' in data.columns:
+                        data['Date'] = pd.to_datetime(data['Date'])
+                        data.set_index('Date', inplace=True)
+                    
+                    # Filter by date range if data is available
+                    start_dt = pd.to_datetime(start_date.replace('Z', ''))
+                    end_dt = pd.to_datetime(end_date.replace('Z', ''))
+                    
+                    if not data.empty:
+                        # Filter to date range
+                        mask = (data.index >= start_dt) & (data.index <= end_dt)
+                        data = data[mask]
+                    
+                    print(f"✅ Data service provided {len(data)} data points for {symbol}")
+                else:
+                    raise Exception("Data service returned empty response")
+                    
+            except Exception as data_service_error:
+                print(f"⚠️ Data service failed: {data_service_error}")
+                print("🔄 Falling back to direct yfinance call...")
+                
+                # Fallback to direct yfinance with better error handling
+                try:
+                    ticker = yf.Ticker(symbol)
+                    data = ticker.history(start=start_date, end=end_date)
+                    print(f"📊 Direct yfinance: {len(data)} data points")
+                except Exception as yf_error:
+                    print(f"❌ Direct yfinance also failed: {yf_error}")
+                    data = pd.DataFrame()  # Empty DataFrame
             
             print(f"Received {len(data)} data points for {symbol}")
             
@@ -205,16 +251,27 @@ class PortfolioService:
                 print(f"No data available for {symbol}, using mock data")
                 # Calculate days between dates for mock data
                 from datetime import datetime
-                start = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
-                end = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+                try:
+                    start = datetime.fromisoformat(start_date.replace('Z', ''))
+                    end = datetime.fromisoformat(end_date.replace('Z', ''))
+                except ValueError:
+                    # Handle different date formats
+                    start = pd.to_datetime(start_date).to_pydatetime()
+                    end = pd.to_datetime(end_date).to_pydatetime()
+                
                 days = (end - start).days
                 data = self._generate_mock_price_data(symbol, days)
             
             if len(data) < 50:  # Reduced threshold
                 print(f"Insufficient data for backtesting: only {len(data)} data points, using mock data")
                 from datetime import datetime
-                start = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
-                end = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+                try:
+                    start = datetime.fromisoformat(start_date.replace('Z', ''))
+                    end = datetime.fromisoformat(end_date.replace('Z', ''))
+                except ValueError:
+                    start = pd.to_datetime(start_date).to_pydatetime()
+                    end = pd.to_datetime(end_date).to_pydatetime()
+                
                 days = max(365, (end - start).days)  # Ensure at least 1 year of data
                 data = self._generate_mock_price_data(symbol, days)
             
@@ -228,7 +285,18 @@ class PortfolioService:
                 raise Exception(f"Unknown strategy: {strategy}")
                 
         except Exception as e:
-            raise Exception(f"Backtesting error: {str(e)}")
+            print(f"❌ Backtesting error for {symbol}: {str(e)}")
+            # Return a safe fallback result instead of raising exception
+            return {
+                "symbol": symbol,
+                "strategy": strategy,
+                "final_value": 100000,
+                "total_return": 0.0,
+                "trade_count": 0,
+                "trades": [],
+                "error": str(e),
+                "status": "fallback_used"
+            }
     
     async def _backtest_ema_crossover(self, symbol: str, data: pd.DataFrame) -> Dict:
         """Backtest EMA crossover strategy"""
@@ -344,58 +412,130 @@ class PortfolioService:
     
     async def _backtest_xgboost(self, symbol: str, data: pd.DataFrame) -> Dict:
         """Backtest XGBoost strategy"""
-        df = self.prepare_features(data)
-        
-        # Create target
-        df['Next_Return'] = df['Returns'].shift(-1)
-        df['Direction'] = (df['Next_Return'] > 0).astype(int)
-        df = df.dropna()
-        
-        capital = 100000
-        position = 0
-        trades = []
-        
-        # Walk-forward analysis
-        for i in range(60, len(df)):
-            # Train model
-            train_data = df.iloc[:i]
+        try:
+            df = self.prepare_features(data)
+            
+            # Create target
+            df['Next_Return'] = df['Returns'].shift(-1)
+            df['Direction'] = (df['Next_Return'] > 0).astype(int)
+            df = df.dropna()
+            
+            if len(df) < 60:
+                print(f"Insufficient data for XGBoost backtesting: only {len(df)} data points")
+                # Return a default result
+                return {
+                    "symbol": symbol,
+                    "strategy": "XGBoost",
+                    "final_value": 100000,
+                    "total_return": 0.0,
+                    "trade_count": 0,
+                    "trades": [],
+                    "error": "Insufficient data for backtesting"
+                }
+            
+            capital = 100000
+            position = 0
+            trades = []
+            
+            # Use features that we know exist
             feature_cols = ['Returns', 'SMA_5', 'SMA_20', 'Volatility']
-            X_train = train_data[feature_cols].values
-            y_train = train_data['Direction'].values
             
-            scaler = StandardScaler()
-            X_train_scaled = scaler.fit_transform(X_train)
+            # Check if all required features exist
+            missing_features = [col for col in feature_cols if col not in df.columns]
+            if missing_features:
+                print(f"Missing features: {missing_features}, using available features")
+                # Use only available features
+                available_features = ['Returns', 'Returns_Lag_1', 'Returns_Lag_2', 'Returns_Lag_3']
+                feature_cols = [col for col in available_features if col in df.columns]
             
-            model = XGBClassifier(n_estimators=50, max_depth=3, random_state=42)
-            model.fit(X_train_scaled, y_train)
+            if not feature_cols:
+                raise Exception("No valid features available for XGBoost training")
             
-            # Predict
-            X_current = df.iloc[i:i+1][feature_cols].values
-            X_current_scaled = scaler.transform(X_current)
-            prediction = model.predict(X_current_scaled)[0]
-            current_price = df.iloc[i]['Close']
+            # Walk-forward analysis
+            for i in range(60, len(df)):
+                try:
+                    # Train model
+                    train_data = df.iloc[:i]
+                    X_train = train_data[feature_cols].values
+                    y_train = train_data['Direction'].values
+                    
+                    # Skip if insufficient training data
+                    if len(X_train) < 30:
+                        continue
+                    
+                    scaler = StandardScaler()
+                    X_train_scaled = scaler.fit_transform(X_train)
+                    
+                    # Train model with optimized parameters (equivalent to FastXGBoost config)
+                    model = XGBClassifier(
+                        n_estimators=50,
+                        max_depth=3,
+                        learning_rate=0.1,
+                        subsample=0.8,
+                        colsample_bytree=0.8,
+                        tree_method='hist',
+                        grow_policy='lossguide',
+                        n_jobs=min(8, os.cpu_count()),
+                        random_state=42,
+                        verbosity=0
+                    )
+                    model.fit(X_train_scaled, y_train)
+                    
+                    # Predict
+                    X_current = df.iloc[i:i+1][feature_cols].values
+                    X_current_scaled = scaler.transform(X_current)
+                    prediction = model.predict(X_current_scaled)[0]
+                    current_price = df.iloc[i]['Close']
+                    
+                    # Trading logic
+                    if prediction == 1 and position == 0:
+                        # Buy
+                        position = capital / current_price
+                        capital = 0
+                        trades.append({
+                            'action': 'BUY',
+                            'date': df.index[i].isoformat(),
+                            'price': current_price,
+                            'quantity': position
+                        })
+                    elif prediction == 0 and position > 0:
+                        # Sell
+                        capital = position * current_price
+                        trades.append({
+                            'action': 'SELL',
+                            'date': df.index[i].isoformat(),
+                            'price': current_price,
+                            'quantity': position
+                        })
+                        position = 0
+                        
+                except Exception as step_error:
+                    print(f"Error in step {i}: {step_error}")
+                    continue
             
-            # Trading logic
-            if prediction == 1 and position == 0:
-                # Buy
-                position = capital / current_price
-                capital = 0
-                trades.append({
-                    'action': 'BUY',
-                    'date': df.index[i].isoformat(),
-                    'price': current_price,
-                    'quantity': position
-                })
-            elif prediction == 0 and position > 0:
-                # Sell
-                capital = position * current_price
-                trades.append({
-                    'action': 'SELL',
-                    'date': df.index[i].isoformat(),
-                    'price': current_price,
-                    'quantity': position
-                })
-                position = 0
+            final_value = capital + (position * df.iloc[-1]['Close'])
+            total_return = (final_value / 100000 - 1) * 100
+            
+            return {
+                "symbol": symbol,
+                "strategy": "XGBoost",
+                "final_value": round(final_value, 2),
+                "total_return": round(total_return, 2),
+                "trade_count": len(trades),
+                "trades": trades[-10:]  # Return last 10 trades
+            }
+            
+        except Exception as e:
+            print(f"XGBoost backtesting error for {symbol}: {str(e)}")
+            return {
+                "symbol": symbol,
+                "strategy": "XGBoost",
+                "final_value": 100000,
+                "total_return": 0.0,
+                "trade_count": 0,
+                "trades": [],
+                "error": str(e)
+            }
         
         final_value = capital + (position * df.iloc[-1]['Close'])
         total_return = (final_value / 100000 - 1) * 100

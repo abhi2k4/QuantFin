@@ -130,8 +130,19 @@ class MLService:
             X_train_scaled = scaler.fit_transform(X_train)
             X_test_scaled = scaler.transform(X_test)
             
-            # Train model
-            model = XGBClassifier(n_estimators=100, max_depth=5, random_state=42)
+            # Train model with optimized parameters (equivalent to FastXGBoost config)
+            model = XGBClassifier(
+                n_estimators=100,
+                max_depth=5,
+                learning_rate=0.1,
+                subsample=0.8,
+                colsample_bytree=0.8,
+                tree_method='hist',
+                grow_policy='lossguide',
+                n_jobs=min(8, os.cpu_count()),
+                random_state=42,
+                verbosity=0
+            )
             model.fit(X_train_scaled, y_train)
             
             # Evaluate

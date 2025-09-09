@@ -7,19 +7,22 @@ import LoadingSpinner from '../components/LoadingSpinner'
 const Portfolio = () => {
   const [investmentAmount, setInvestmentAmount] = useState(100000)
   const [optimizedPortfolio, setOptimizedPortfolio] = useState(null)
+  const [shouldFetch, setShouldFetch] = useState(false)
 
   const optimizeMutation = useMutation({
     mutationFn: (data) => api.post('/api/portfolio/optimize', data),
     onSuccess: (data) => setOptimizedPortfolio(data.data),
   })
 
+  // Only fetch when explicitly requested, not on every input change
   const { data: nifty50Optimization, isLoading: optimizationLoading } = useQuery({
     queryKey: ['nifty50-optimization', investmentAmount],
     queryFn: () => api.get(`/api/portfolio/nifty50-optimization?investment_amount=${investmentAmount}`),
-    enabled: !!investmentAmount,
+    enabled: shouldFetch && !!investmentAmount && investmentAmount > 0,
   })
 
   const handleOptimize = () => {
+    setShouldFetch(true) // Trigger the query only when button is clicked
     const topStocks = [
       'RELIANCE.NS', 'TCS.NS', 'HDFCBANK.NS', 'INFY.NS', 'ICICIBANK.NS',
       'KOTAKBANK.NS', 'BAJFINANCE.NS', 'AXISBANK.NS', 'HCLTECH.NS', 'WIPRO.NS'
@@ -31,6 +34,21 @@ const Portfolio = () => {
       risk_tolerance: 0.6,
       time_horizon: 252 * 5
     })
+  }
+
+  // Handle input changes without triggering API calls
+  const handleInvestmentChange = (e) => {
+    const value = e.target.value
+    // Prevent leading zeros but allow empty input
+    if (value === '' || (value === '0' && investmentAmount !== 0)) {
+      setInvestmentAmount('')
+    } else {
+      const numValue = Number(value)
+      if (!isNaN(numValue) && numValue >= 0) {
+        setInvestmentAmount(numValue)
+      }
+    }
+    setShouldFetch(false) // Reset fetch trigger when input changes
   }
 
   if (optimizationLoading) {
@@ -64,10 +82,11 @@ const Portfolio = () => {
               <input
                 type="number"
                 value={investmentAmount}
-                onChange={(e) => setInvestmentAmount(Number(e.target.value))}
+                onChange={handleInvestmentChange}
                 className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white"
                 min="10000"
                 step="10000"
+                placeholder="Enter amount"
               />
             </div>
             <button
@@ -92,25 +111,25 @@ const Portfolio = () => {
               <div className="bg-gray-700 p-4 rounded-lg">
                 <div className="text-gray-400 text-sm">Total Investment</div>
                 <div className="text-xl font-bold text-white">
-                  ₹{portfolio.investment_amount?.toLocaleString()}
+                  ₹{(portfolio.investment_amount || 0).toLocaleString()}
                 </div>
               </div>
               <div className="bg-gray-700 p-4 rounded-lg">
                 <div className="text-gray-400 text-sm">Allocated</div>
                 <div className="text-xl font-bold text-white">
-                  ₹{portfolio.total_allocated?.toLocaleString()}
+                  ₹{(portfolio.total_allocated || 0).toLocaleString()}
                 </div>
               </div>
               <div className="bg-gray-700 p-4 rounded-lg">
-                <div className="text-gray-400 text-sm">Predicted Value (5Y)</div>
+                <div className="text-gray-400 text-sm">Predicted Value (1Y)</div>
                 <div className="text-xl font-bold text-green-400">
-                  ₹{portfolio.predicted_value_5y?.toLocaleString()}
+                  ₹{(portfolio.predicted_value_1y || portfolio.predicted_value_5y || 0).toLocaleString()}
                 </div>
               </div>
               <div className="bg-gray-700 p-4 rounded-lg">
                 <div className="text-gray-400 text-sm">Expected Return</div>
                 <div className="text-xl font-bold text-green-400">
-                  {portfolio.expected_return_5y?.toFixed(2)}%
+                  {(portfolio.expected_return_1y || portfolio.expected_return_5y || 0).toFixed(2)}%
                 </div>
               </div>
             </div>
@@ -145,22 +164,22 @@ const Portfolio = () => {
                       {holding.index?.replace('.NS', '') || holding.symbol?.replace('.NS', '')}
                     </td>
                     <td className="py-3 text-right text-white">
-                      {((holding.weight || holding['Weight']) * 100).toFixed(2)}%
+                      {((holding.weight || 0) * 100).toFixed(2)}%
                     </td>
                     <td className="py-3 text-right text-white">
-                      ₹{(holding.allocation || holding['Allocation (₹)']).toLocaleString()}
+                      ₹{(holding.allocation || 0).toLocaleString()}
                     </td>
                     <td className="py-3 text-right text-white">
-                      ₹{(holding.current_price || holding['Current Price']).toFixed(2)}
+                      ₹{(holding.current_price || 0).toFixed(2)}
                     </td>
                     <td className="py-3 text-right text-white">
-                      {holding.quantity || holding['Quantity']}
+                      {Math.floor(holding.quantity || 0)}
                     </td>
                     <td className="py-3 text-right text-green-400">
-                      ₹{(holding.predicted_price || holding['Predicted Price']).toFixed(2)}
+                      ₹{(holding.predicted_price || 0).toFixed(2)}
                     </td>
                     <td className="py-3 text-right text-green-400">
-                      {((holding.expected_return || holding['Expected Return']) * 100).toFixed(2)}%
+                      {((holding.expected_return || 0) * 100).toFixed(2)}%
                     </td>
                   </tr>
                 ))}
@@ -177,7 +196,7 @@ const Portfolio = () => {
           {portfolio?.holdings && (
             <div className="space-y-3">
               {portfolio.holdings.slice(0, 8).map((holding, index) => {
-                const weight = (holding.weight || holding['Weight']) * 100
+                const weight = (holding.weight || 0) * 100
                 return (
                   <div key={index} className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -210,19 +229,19 @@ const Portfolio = () => {
               <div className="flex justify-between items-center p-4 bg-gray-700 rounded-lg">
                 <span className="text-gray-400">Current Portfolio Value</span>
                 <span className="text-white font-bold text-xl">
-                  ₹{portfolio.total_allocated?.toLocaleString()}
+                  ₹{(portfolio.total_allocated || 0).toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between items-center p-4 bg-green-900/20 border border-green-700 rounded-lg">
-                <span className="text-gray-400">Projected Value (5Y)</span>
+                <span className="text-gray-400">Projected Value (1Y)</span>
                 <span className="text-green-400 font-bold text-xl">
-                  ₹{portfolio.predicted_value_5y?.toLocaleString()}
+                  ₹{(portfolio.predicted_value_1y || portfolio.predicted_value_5y || 0).toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between items-center p-4 bg-blue-900/20 border border-blue-700 rounded-lg">
                 <span className="text-gray-400">Expected CAGR</span>
                 <span className="text-blue-400 font-bold text-xl">
-                  {(portfolio.expected_return_5y / 5).toFixed(2)}%
+                  {((portfolio.expected_return_1y || portfolio.expected_return_5y || 0)).toFixed(2)}%
                 </span>
               </div>
             </div>

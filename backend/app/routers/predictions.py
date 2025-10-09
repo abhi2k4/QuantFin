@@ -13,8 +13,8 @@ from typing import List, Optional
 from datetime import datetime
 
 from app.services.predict_service import PredictionService
-from app.services.features import FeatureEngineer
-from app.services.preprocessing import DataPreprocessor
+from app.services.feature_engineer import FeatureEngineer
+from app.services.data_preprocessor import DataPreprocessor
 
 # Create router
 router = APIRouter(prefix="/api/predictions", tags=["predictions"])
@@ -215,9 +215,9 @@ async def get_model_info(
         elif model_type == 'svm':
             from app.ml_models.svm_model import SVMModel
             model = SVMModel(symbol)
-        elif model_type == 'arima':
-            from app.ml_models.arima_model import ARIMAModel
-            model = ARIMAModel(symbol)
+        # elif model_type == 'arima':
+        #     from app.ml_models.arima_model import ARIMAModel
+        #     model = ARIMAModel(symbol)
         elif model_type == 'lstm':
             from app.ml_models.lstm_model import LSTMModel
             model = LSTMModel(symbol)

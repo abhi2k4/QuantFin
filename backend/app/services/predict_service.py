@@ -18,12 +18,12 @@ import pandas as pd
 import numpy as np
 from scipy.optimize import minimize
 
-from app.services.features import FeatureEngineer
+from app.services.feature_engineer import FeatureEngineer
 from app.ml_models.linear_reg import LinearRegModel
 from app.ml_models.logreg import LogisticRegModel
 from app.ml_models.svm_model import SVMModel
-from app.ml_models.arima_model import ARIMAModel
-from app.ml_models.lstm_model import LSTMModel
+# from app.ml_models.arima_model import ARIMAModel  # TODO: ARIMA model not yet implemented
+# from app.ml_models.lstm_model import LSTMModel  # Lazy load to avoid TensorFlow import issues
 
 # Configure logging
 logging.basicConfig(
@@ -118,16 +118,17 @@ class PredictionService:
                         self.loaded_models['svm'][symbol] = model
                         load_stats['svm'] += 1
                     
-                    elif model_type == 'arima':
-                        model = ARIMAModel(
-                            symbol=symbol,
-                            models_dir=str(self.models_base_dir / "arima")
-                        )
-                        model.load_model(version)
-                        self.loaded_models['arima'][symbol] = model
-                        load_stats['arima'] += 1
+                    # elif model_type == 'arima':
+                    #     model = ARIMAModel(
+                    #         symbol=symbol,
+                    #         models_dir=str(self.models_base_dir / "arima")
+                    #     )
+                    #     model.load_model(version)
+                    #     self.loaded_models['arima'][symbol] = model
+                    #     load_stats['arima'] += 1
                     
                     elif model_type == 'lstm':
+                        from app.ml_models.lstm_model import LSTMModel  # Lazy load
                         model = LSTMModel(
                             symbol=symbol,
                             models_dir=str(self.models_base_dir / "lstm")

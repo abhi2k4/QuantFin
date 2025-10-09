@@ -93,3 +93,8 @@ class MLPrediction(BaseModel):
     confidence: float
     prediction_date: datetime
     target_date: datetime
+
+class RebalanceRequest(BaseModel):
+    """Portfolio rebalancing request schema"""
+    strategy: str = Field(..., description="ML strategy: LSTM, Linear, Logistic, or SVM")
+    capital_allocation: float = Field(..., gt=0, description="Amount to allocate for rebalancing")

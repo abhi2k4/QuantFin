@@ -16,8 +16,8 @@ from datetime import datetime
 import logging
 import time
 
-from routers import sectors
-from app.routers import backtest, predictions
+# from routers import sectors  # TODO: sectors router not yet implemented
+from app.routers import backtest, predictions, portfolio, analytics
 
 # Configure logging
 logging.basicConfig(
@@ -83,7 +83,9 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 
 # Register routers
-app.include_router(sectors.router, prefix="/api")
+# app.include_router(sectors.router, prefix="/api")  # TODO: sectors router not yet implemented
+app.include_router(portfolio.router)  # Portfolio management endpoints
+app.include_router(analytics.router)  # Analytics dashboard endpoints
 app.include_router(backtest.router)  # Already has /api/backtest prefix
 app.include_router(predictions.router)  # Already has /api/predictions prefix
 
@@ -101,7 +103,8 @@ async def root():
         "timestamp": datetime.now().isoformat(),
         "documentation": "/docs",
         "endpoints": {
-            "sectors": "/api/sectors",
+            "portfolio": "/api/portfolio",
+            "analytics": "/api/analytics",
             "backtest": "/api/backtest",
             "predictions": "/api/predictions",
             "health": "/health"
@@ -135,17 +138,17 @@ async def startup_event():
     
     try:
         # Trigger data loading by accessing the preprocessor
-        from services.preprocessing import get_preprocessor
-        preprocessor = get_preprocessor()
+        from app.services.data_preprocessor import DataPreprocessor
+        preprocessor = DataPreprocessor()
         
-        logger.info(f"Loaded {len(preprocessor.stock_data)} stocks")
-        logger.info(f"Created {len(preprocessor.sector_data)} sector aggregations")
+        # Get available symbols to verify data loading
+        available_symbols = preprocessor.get_all_symbols()
+        logger.info(f"Found {len(available_symbols)} stock symbols available")
         
-        date_range = preprocessor.get_date_range()
-        if date_range:
-            logger.info(f"Data range: {date_range[0].date()} to {date_range[1].date()}")
+        if len(available_symbols) > 0:
+            logger.info(f"Sample symbols: {', '.join(available_symbols[:5])}")
         
-        logger.info("Data preprocessing completed successfully")
+        logger.info("Data preprocessing initialized successfully")
         
     except Exception as e:
         logger.error(f"Error during startup: {e}", exc_info=True)

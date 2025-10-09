@@ -1,0 +1,133 @@
+{
+  "timestamp": "2025-10-10T00:50:58.922603",
+  "models_trained": [
+    {
+      "status": "success",
+      "model_type": "linear_reg",
+      "symbol": "RELIANCE",
+      "metrics": {
+        "symbol": "RELIANCE",
+        "best_alpha": 100.0,
+        "train_mse": 0.01230829719793708,
+        "test_mse": 0.009985611273806563,
+        "train_mae": 0.08005961766511023,
+        "test_mae": 0.07419262422072598,
+        "train_r2": 0.05057336394964762,
+        "test_r2": -0.3353728687487032,
+        "n_features": 72,
+        "n_samples": 7150,
+        "training_time_seconds": 2.422754,
+        "trained_at": "2025-10-10T00:51:01.434240"
+      }
+    },
+    {
+      "status": "success",
+      "model_type": "logreg",
+      "symbol": "RELIANCE",
+      "metrics": {
+        "symbol": "RELIANCE",
+        "best_C": 100.0,
+        "train_accuracy": 0.5418410041841004,
+        "test_accuracy": 0.5003484320557491,
+        "train_precision": 0.5530973451327433,
+        "test_precision": 0.552,
+        "train_recall": 0.5527210884353742,
+        "test_recall": 0.1857335127860027,
+        "train_f1": 0.5529091527730521,
+        "test_f1": 0.27794561933534745,
+        "train_auc": 0.5595107928722276,
+        "test_auc": 0.5072682220960175,
+        "confusion_matrix": [
+          [
+            580,
+            112
+          ],
+          [
+            605,
+            138
+          ]
+        ],
+        "n_features": 72,
+        "n_samples": 7171,
+        "training_time_seconds": 1.632584,
+        "trained_at": "2025-10-10T00:51:03.073806"
+      }
+    },
+    {
+      "status": "success",
+      "model_type": "svm",
+      "symbol": "RELIANCE",
+      "metrics": {
+        "symbol": "RELIANCE",
+        "best_params": {
+          "C": 10.0,
+          "gamma": 0.01,
+          "kernel": "rbf"
+        },
+        "train_accuracy": 0.5538702928870293,
+        "test_accuracy": 0.5135888501742161,
+        "train_precision": 0.5362511893434824,
+        "test_precision": 0.515946137491141,
+        "train_recall": 0.9585034013605442,
+        "test_recall": 0.9798115746971736,
+        "train_f1": 0.6877364246491763,
+        "test_f1": 0.6759517177344475,
+        "train_auc": 0.6863999104649013,
+        "test_auc": 0.5051462980107204,
+        "confusion_matrix": [
+          [
+            9,
+            683
+          ],
+          [
+            15,
+            728
+          ]
+        ],
+        "n_features": 72,
+        "n_samples": 7171,
+        "training_time_seconds": 23.180578,
+        "trained_at": "2025-10-10T00:51:26.257507"
+      }
+    },
+    {
+      "status": "success",
+      "model_type": "lstm",
+      "symbol": "RELIANCE",
+      "metrics": {
+        "symbol": "RELIANCE",
+        "sequence_length": 60,
+        "n_features": 73,
+        "n_samples": 7171,
+        "n_sequences": 7111,
+        "train_size": 5688,
+        "test_size": 1423,
+        "epochs_run": 5,
+        "final_train_loss": 0.00015207647811621428,
+        "final_val_loss": 0.029658764600753784,
+        "test_mse": 74506.37728909745,
+        "test_rmse": 272.95856331886245,
+        "test_mae": 246.0904021380405,
+        "test_r2": -0.37492128563954985,
+        "test_mape": 20.447477571047454,
+        "lstm_units": [
+          128,
+          64
+        ],
+        "dropout_rate": 0.2,
+        "training_time_seconds": 53.351233,
+        "trained_at": "2025-10-10T00:52:19.627849"
+      },
+      "epochs": 5
+    }
+  ],
+  "errors": [],
+  "summary": {
+    "total_symbols": 1,
+    "total_models": 4,
+    "successful_trainings": 4,
+    "failed_trainings": 0,
+    "duration_seconds": 80.774254,
+    "duration_formatted": "1m 20s"
+  }
+}

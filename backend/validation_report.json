@@ -1,0 +1,42 @@
+{
+  "timestamp": "2025-10-09T23:19:55.441521",
+  "tests": {
+    "Environment Setup": {
+      "passed": true,
+      "details": "Packages installed, 49 data files found",
+      "duration": "4.98s"
+    },
+    "API Route Registration": {
+      "passed": false,
+      "details": "attempted relative import beyond top-level package",
+      "duration": "0.01s"
+    },
+    "Backtester Module": {
+      "passed": false,
+      "details": "0 passed, 0 failed",
+      "duration": "6.52s"
+    },
+    "Integration Tests": {
+      "passed": false,
+      "details": "Backtester.__init__() missing 1 required positional argument: 'models_dir'",
+      "duration": "0.23s"
+    }
+  },
+  "errors": [
+    "API endpoints: attempted relative import beyond top-level package",
+    "Backtester: 2025-10-09 23:20:01,710 - __main__ - INFO - ============================================================\n2025-10-09 23:20:01,710 - __main__ - INFO - BACKTEST API TEST SUITE\n2025-10-09 23:20:01,710 - _",
+    "Integration: Backtester.__init__() missing 1 required positional argument: 'models_dir'"
+  ],
+  "warnings": [
+    "No GPU available - LSTM training will be slower"
+  ],
+  "summary": {
+    "total_tests": 4,
+    "passed": 1,
+    "failed": 3,
+    "errors": 3,
+    "warnings": 1,
+    "success_rate": "25.0%"
+  },
+  "production_ready": false
+}

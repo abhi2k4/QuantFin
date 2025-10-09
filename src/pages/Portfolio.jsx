@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { PieChart, DollarSign, TrendingUp, Briefcase, Target } from 'lucide-react'
 import { api } from '../services/api'
@@ -13,13 +13,19 @@ const Portfolio = () => {
     onSuccess: (data) => setOptimizedPortfolio(data.data),
   })
 
-  const { data: nifty50Optimization, isLoading: optimizationLoading } = useQuery({
-    queryKey: ['nifty50-optimization', investmentAmount],
+  const { data: nifty50Optimization, isLoading: optimizationLoading, refetch } = useQuery({
+    queryKey: ['nifty50-optimization'],
     queryFn: () => api.get(`/api/portfolio/nifty50-optimization?investment_amount=${investmentAmount}`),
-    enabled: !!investmentAmount,
+    enabled: false, // Disable automatic execution
   })
 
-  const handleOptimize = () => {
+  const handleOptimize = useCallback(() => {
+    if (investmentAmount && investmentAmount > 0) {
+      refetch(); // Only call API on button click
+    }
+  }, [investmentAmount, refetch])
+
+  const handleCustomOptimize = () => {
     const topStocks = [
       'RELIANCE.NS', 'TCS.NS', 'HDFCBANK.NS', 'INFY.NS', 'ICICIBANK.NS',
       'KOTAKBANK.NS', 'BAJFINANCE.NS', 'AXISBANK.NS', 'HCLTECH.NS', 'WIPRO.NS'
@@ -63,8 +69,11 @@ const Portfolio = () => {
               <label className="block text-gray-400 text-sm mb-2">Investment Amount (₹)</label>
               <input
                 type="number"
-                value={investmentAmount}
-                onChange={(e) => setInvestmentAmount(Number(e.target.value))}
+                value={investmentAmount === 0 ? '' : investmentAmount}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setInvestmentAmount(value === '' ? 0 : Number(value));
+                }}
                 className="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white"
                 min="10000"
                 step="10000"
@@ -102,15 +111,15 @@ const Portfolio = () => {
                 </div>
               </div>
               <div className="bg-gray-700 p-4 rounded-lg">
-                <div className="text-gray-400 text-sm">Predicted Value (5Y)</div>
+                <div className="text-gray-400 text-sm">Predicted Value (1Y)</div>
                 <div className="text-xl font-bold text-green-400">
-                  ₹{portfolio.predicted_value_5y?.toLocaleString()}
+                  ₹{portfolio.predicted_value_1y?.toLocaleString() || '0'}
                 </div>
               </div>
               <div className="bg-gray-700 p-4 rounded-lg">
                 <div className="text-gray-400 text-sm">Expected Return</div>
                 <div className="text-xl font-bold text-green-400">
-                  {portfolio.expected_return_5y?.toFixed(2)}%
+                  {portfolio.expected_return_1y?.toFixed(2) || '0'}%
                 </div>
               </div>
             </div>
@@ -145,22 +154,22 @@ const Portfolio = () => {
                       {holding.index?.replace('.NS', '') || holding.symbol?.replace('.NS', '')}
                     </td>
                     <td className="py-3 text-right text-white">
-                      {((holding.weight || holding['Weight']) * 100).toFixed(2)}%
+                      {((holding.weight || holding['Weight'] || 0) * 100).toFixed(2)}%
                     </td>
                     <td className="py-3 text-right text-white">
-                      ₹{(holding.allocation || holding['Allocation (₹)']).toLocaleString()}
+                      ₹{(holding.allocation || holding['Allocation (₹)'] || 0).toLocaleString()}
                     </td>
                     <td className="py-3 text-right text-white">
-                      ₹{(holding.current_price || holding['Current Price']).toFixed(2)}
+                      ₹{(holding.current_price || holding['Current Price'] || 0).toFixed(2)}
                     </td>
                     <td className="py-3 text-right text-white">
-                      {holding.quantity || holding['Quantity']}
+                      {(holding.shares || holding.quantity || holding['Quantity'] || 0).toFixed(0)}
                     </td>
                     <td className="py-3 text-right text-green-400">
-                      ₹{(holding.predicted_price || holding['Predicted Price']).toFixed(2)}
+                      ₹{(holding.predicted_price || holding['Predicted Price'] || 0).toFixed(2)}
                     </td>
                     <td className="py-3 text-right text-green-400">
-                      {((holding.expected_return || holding['Expected Return']) * 100).toFixed(2)}%
+                      {((holding.expected_return || holding['Expected Return'] || 0) * 100).toFixed(2)}%
                     </td>
                   </tr>
                 ))}
@@ -177,7 +186,7 @@ const Portfolio = () => {
           {portfolio?.holdings && (
             <div className="space-y-3">
               {portfolio.holdings.slice(0, 8).map((holding, index) => {
-                const weight = (holding.weight || holding['Weight']) * 100
+                const weight = (holding.weight || holding['Weight'] || 0) * 100
                 return (
                   <div key={index} className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -214,15 +223,15 @@ const Portfolio = () => {
                 </span>
               </div>
               <div className="flex justify-between items-center p-4 bg-green-900/20 border border-green-700 rounded-lg">
-                <span className="text-gray-400">Projected Value (5Y)</span>
+                <span className="text-gray-400">Projected Value (1Y)</span>
                 <span className="text-green-400 font-bold text-xl">
-                  ₹{portfolio.predicted_value_5y?.toLocaleString()}
+                  ₹{portfolio.predicted_value_1y?.toLocaleString() || '0'}
                 </span>
               </div>
               <div className="flex justify-between items-center p-4 bg-blue-900/20 border border-blue-700 rounded-lg">
-                <span className="text-gray-400">Expected CAGR</span>
+                <span className="text-gray-400">Expected Return (1Y)</span>
                 <span className="text-blue-400 font-bold text-xl">
-                  {(portfolio.expected_return_5y / 5).toFixed(2)}%
+                  {portfolio.expected_return_1y?.toFixed(2) || '0'}%
                 </span>
               </div>
             </div>

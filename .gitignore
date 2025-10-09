@@ -129,8 +129,6 @@ api_keys.json
 credentials.json
 
 # Downloaded market data
-data/
-*.csv
 historical_data/
 market_data/
 

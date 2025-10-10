@@ -208,7 +208,7 @@ export default function Analytics() {
                       
                       <div>
                         <div className="text-3xl font-bold text-white">
-                          {(model.accuracy * 100).toFixed(1)}%
+                          {(model.accuracy > 1 ? model.accuracy : model.accuracy * 100).toFixed(1)}%
                         </div>
                         <div className="text-sm text-gray-400">Test Accuracy</div>
                       </div>
@@ -253,8 +253,8 @@ export default function Analytics() {
             <ResponsiveContainer width="100%" height={350}>
               <BarChart data={models.map(m => ({
                 ...m,
-                accuracy: m.accuracy * 100,
-                train_accuracy: m.train_accuracy * 100
+                accuracy: m.accuracy > 1 ? m.accuracy : m.accuracy * 100,
+                train_accuracy: m.train_accuracy > 1 ? m.train_accuracy : m.train_accuracy * 100
               }))}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                 <XAxis dataKey="model" stroke="#9ca3af" />
@@ -419,10 +419,10 @@ export default function Analytics() {
                     >
                       <td className="py-3 px-4 font-medium text-white">{model.model}</td>
                       <td className="py-3 px-4 text-right text-green-400">
-                        {(model.train_accuracy * 100).toFixed(1)}%
+                        {(model.train_accuracy > 1 ? model.train_accuracy : model.train_accuracy * 100).toFixed(1)}%
                       </td>
                       <td className="py-3 px-4 text-right font-semibold text-blue-400">
-                        {(model.accuracy * 100).toFixed(1)}%
+                        {(model.accuracy > 1 ? model.accuracy : model.accuracy * 100).toFixed(1)}%
                       </td>
                       <td className="py-3 px-4 text-right text-gray-300">
                         {model.rmse.toFixed(2)}

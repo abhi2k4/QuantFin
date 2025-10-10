@@ -151,14 +151,14 @@ export default function ModelInsights() {
                         <Icon className={`w-10 h-10 ${colorClass} mb-4`} />
                         <h3 className="font-semibold text-lg mb-2">{model.model}</h3>
                         <p className={`text-3xl font-bold ${colorClass} mb-1`}>
-                          {(model.accuracy * 100).toFixed(1)}%
+                          {(model.accuracy > 1 ? model.accuracy : model.accuracy * 100).toFixed(1)}%
                         </p>
                         <p className="text-sm text-gray-400 mb-4">Test Accuracy</p>
                         
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between items-center">
                             <span className="text-gray-400">Train Acc:</span>
-                            <span className="text-white font-medium">{(model.train_accuracy * 100).toFixed(1)}%</span>
+                            <span className="text-white font-medium">{(model.train_accuracy > 1 ? model.train_accuracy : model.train_accuracy * 100).toFixed(1)}%</span>
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="text-gray-400">R² Score:</span>
@@ -231,10 +231,10 @@ export default function ModelInsights() {
                                 )}
                               </td>
                               <td className="py-3 px-4 text-right font-mono text-green-400">
-                                {(model.accuracy * 100).toFixed(2)}%
+                                {(model.accuracy > 1 ? model.accuracy : model.accuracy * 100).toFixed(2)}%
                               </td>
                               <td className="py-3 px-4 text-right font-mono text-blue-400">
-                                {(model.train_accuracy * 100).toFixed(2)}%
+                                {(model.train_accuracy > 1 ? model.train_accuracy : model.train_accuracy * 100).toFixed(2)}%
                               </td>
                               <td className="py-3 px-4 text-right font-mono text-gray-400">
                                 {model.mae.toFixed(2)}

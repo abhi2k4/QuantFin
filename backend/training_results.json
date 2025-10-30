@@ -1,0 +1,58 @@
+{
+  "timestamp": "2025-10-31T00:44:11.847974",
+  "split_date": "2023-01-01",
+  "models_trained": [
+    {
+      "status": "success",
+      "symbol": "RELIANCE",
+      "model_type": "linear",
+      "train_samples": 6768,
+      "test_samples": 662,
+      "train_mse": 0.01487777678604167,
+      "test_mse": 0.003591404290115266,
+      "train_mae": 0.08159161042106203,
+      "test_mae": 0.04936053955796744,
+      "train_r2": 0.021392769207244866,
+      "test_r2": -0.13659968994702343,
+      "model_path": "models\\linear_reg\\RELIANCE_linear.pkl"
+    },
+    {
+      "status": "success",
+      "symbol": "TCS",
+      "model_type": "linear",
+      "train_samples": 4778,
+      "test_samples": 662,
+      "train_mse": 0.007176891352373567,
+      "test_mse": 0.003637790451745462,
+      "train_mae": 0.06278580724420198,
+      "test_mae": 0.04898648014689955,
+      "train_r2": 0.019656839701496676,
+      "test_r2": -0.13378594150538214,
+      "model_path": "models\\linear_reg\\TCS_linear.pkl"
+    },
+    {
+      "status": "success",
+      "symbol": "INFY",
+      "model_type": "linear",
+      "train_samples": 6771,
+      "test_samples": 662,
+      "train_mse": 0.01405519020872344,
+      "test_mse": 0.005247625053621869,
+      "train_mae": 0.08308290801454399,
+      "test_mae": 0.05706929528884801,
+      "train_r2": 0.015790809082370627,
+      "test_r2": -0.013261183875934002,
+      "model_path": "models\\linear_reg\\INFY_linear.pkl"
+    }
+  ],
+  "errors": [],
+  "summary": {
+    "total_models": 3,
+    "successful": 3,
+    "failed": 0,
+    "avg_test_r2": -0.09454893844277985,
+    "avg_test_mae": 0.05180543833123833,
+    "symbols_trained": 3,
+    "split_date": "2023-01-01"
+  }
+}

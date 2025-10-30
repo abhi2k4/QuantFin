@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { SignUp } from '@clerk/clerk-react';
+import { SignIn } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 
 const fadeInUp = {
@@ -9,7 +9,7 @@ const fadeInUp = {
   visible: { opacity: 1, y: 0 }
 };
 
-export default function Signup() {
+export default function Signin() {
   return (
     <motion.div
       initial="hidden"
@@ -26,13 +26,13 @@ export default function Signup() {
         </Link>
         
         <div className="max-w-md mx-auto">
-          <h1 className="text-5xl font-bold gradient-text mb-6 text-center">Sign Up</h1>
+          <h1 className="text-5xl font-bold gradient-text mb-6 text-center">Sign In</h1>
           <p className="text-xl text-gray-400 mb-12 text-center">
-            Get started with QuantFin AI today
+            Welcome back to QuantFin AI
           </p>
           
           <div className="flex justify-center">
-            <SignUp 
+            <SignIn 
               appearance={{
                 elements: {
                   formButtonPrimary: 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600',
@@ -46,9 +46,9 @@ export default function Signup() {
                 }
               }}
               routing="path"
-              path="/signup"
-              signInUrl="/signin"
-              afterSignUpUrl="/dashboard"
+              path="/signin"
+              signUpUrl="/signup"
+              afterSignInUrl="/dashboard"
             />
           </div>
         </div>

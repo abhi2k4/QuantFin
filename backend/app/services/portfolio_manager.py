@@ -17,76 +17,78 @@ import pandas as pd
 import logging
 
 from .real_data_service import get_real_data_service
+from .portfolio_db import get_portfolio_db
 
 logger = logging.getLogger(__name__)
 
 
 class PortfolioManager:
     """
-    Manages real portfolios with actual stock positions and calculations.
+    Manages real portfolios with actual stock positions stored in SQLite.
     """
     
-    def __init__(self, portfolio_file: Optional[str] = None):
-        """Initialize portfolio manager."""
-        if portfolio_file is None:
-            portfolio_file = Path(__file__).resolve().parent.parent.parent / "data" / "portfolio.json"
-        
-        self.portfolio_file = Path(portfolio_file)
+    def __init__(self):
+        """Initialize portfolio manager with SQLite database."""
         self.data_service = get_real_data_service()
+        self.db = get_portfolio_db()
         self.logger = logging.getLogger(__name__)
+        # Don't initialize default portfolio here - do it on first access
+    
+    def _initialize_default_portfolio(self):
+        """Initialize portfolio with some default stocks if database is empty."""
+        # Simple fallback - just add some popular stocks with default allocations
+        default_positions = [
+            {'symbol': 'RELIANCE', 'quantity': 20, 'buy_price': 2500.0, 'allocation_amount': 50000},
+            {'symbol': 'TCS', 'quantity': 15, 'buy_price': 3500.0, 'allocation_amount': 52500},
+            {'symbol': 'INFY', 'quantity': 30, 'buy_price': 1500.0, 'allocation_amount': 45000},
+            {'symbol': 'HDFCBANK', 'quantity': 25, 'buy_price': 1600.0, 'allocation_amount': 40000},
+        ]
         
-        # Load or create portfolio
-        self.portfolio = self._load_portfolio()
-    
-    def _load_portfolio(self) -> Dict:
-        """Load portfolio from JSON file or create default."""
-        if self.portfolio_file.exists():
-            with open(self.portfolio_file, 'r') as f:
-                return json.load(f)
-        else:
-            # Create default portfolio with sample positions
-            default_portfolio = {
-                'cash_balance': 500000.0,
-                'positions': {
-                    'RELIANCE': {'quantity': 50, 'avg_buy_price': 2500.0},
-                    'TCS': {'quantity': 30, 'avg_buy_price': 3500.0},
-                    'INFY': {'quantity': 40, 'avg_buy_price': 1500.0},
-                    'HDFCBANK': {'quantity': 60, 'avg_buy_price': 1600.0}
-                },
-                'created_at': datetime.now().isoformat(),
-                'last_updated': datetime.now().isoformat()
+        self.db.save_portfolio(
+            positions=default_positions,
+            metadata={
+                'cash_balance': 10000000.0,  # 1 Crore (10M)
+                'total_invested': 187500.0,
+                'strategy': 'MANUAL',
+                'expected_return': 0.0,
+                'expected_risk': 0.0,
+                'sharpe_ratio': 0.0
             }
-            self._save_portfolio(default_portfolio)
-            return default_portfolio
-    
-    def _save_portfolio(self, portfolio: Dict):
-        """Save portfolio to JSON file."""
-        self.portfolio_file.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.portfolio_file, 'w') as f:
-            json.dump(portfolio, f, indent=2)
+        )
+        self.logger.info("Initialized default portfolio with popular stocks")
     
     def get_portfolio_summary(self) -> Dict:
         """
-        Get comprehensive portfolio summary with real calculations.
+        Get comprehensive portfolio summary with real calculations from SQLite.
         
         Returns:
             Dict with positions, values, and daily changes
         """
+        # Get positions from database
+        db_positions = self.db.get_positions()
+        metadata = self.db.get_metadata()
+        
+        if not db_positions:
+            self._initialize_default_portfolio()
+            db_positions = self.db.get_positions()
+            metadata = self.db.get_metadata()
+        
         positions_data = []
         total_invested = 0.0
         current_value = 0.0
         
         # Get latest prices
-        symbols = list(self.portfolio['positions'].keys())
+        symbols = [pos['symbol'] for pos in db_positions]
         latest_prices = self.data_service.get_latest_prices(symbols)
         
         # Calculate yesterday's value for daily change
         yesterday = datetime.now() - timedelta(days=1)
         yesterday_value = 0.0
         
-        for symbol, position_info in self.portfolio['positions'].items():
-            quantity = position_info['quantity']
-            avg_buy_price = position_info['avg_buy_price']
+        for position in db_positions:
+            symbol = position['symbol']
+            quantity = position['quantity']
+            avg_buy_price = position['avg_buy_price']
             
             if symbol not in latest_prices:
                 self.logger.warning(f"No price data for {symbol}")
@@ -142,7 +144,7 @@ class PortfolioManager:
             daily_change = 0
             daily_change_percent = 0
         
-        cash_balance = self.portfolio.get('cash_balance', 0)
+        cash_balance = metadata.get('cash_balance', 0)
         total_value = current_value + cash_balance
         
         return {
@@ -158,165 +160,199 @@ class PortfolioManager:
             'positions': positions_data
         }
     
-    def get_portfolio_performance(self, timeframe: str = '3M') -> Dict:
+    def get_portfolio_performance(
+        self, 
+        timeframe: str = '3M',
+        as_of_date: Optional[datetime] = None
+    ) -> Dict:
         """
-        Get historical portfolio performance.
+        Get comprehensive portfolio performance with REAL historical data and metrics.
         
         Args:
-            timeframe: '1M', '3M', '6M', '1Y'
+            timeframe: "1M", "3M", "6M", or "1Y"
+            as_of_date: Optional date to anchor the timeframe (default: latest available)
             
         Returns:
-            Dict with dates and values
+            Dict with time series data and comprehensive metrics
         """
-        # Map timeframe to days
-        timeframe_days = {
-            '1M': 30,
-            '3M': 90,
-            '6M': 180,
-            '1Y': 365
-        }
+        # Calculate days based on timeframe
+        days_map = {"1M": 30, "3M": 90, "6M": 180, "1Y": 365}
+        days = days_map.get(timeframe, 90)
         
-        days = timeframe_days.get(timeframe, 90)
-        end_date = datetime.now()
+        # Set end date
+        if as_of_date:
+            end_date = as_of_date
+        else:
+            end_date = datetime.now()
+        
         start_date = end_date - timedelta(days=days)
         
-        # Get positions
-        positions = self.portfolio['positions']
+        # Get positions and cash balance from database
+        db_positions = self.db.get_positions()
+        metadata = self.db.get_metadata()
+        cash_balance = metadata.get('cash_balance', 0)
         
-        # Calculate portfolio value for each day
-        dates = []
-        values = []
+        if not db_positions:
+            # Initialize if empty
+            self._initialize_default_portfolio()
+            db_positions = self.db.get_positions()
+            metadata = self.db.get_metadata()
+            cash_balance = metadata.get('cash_balance', 0)
         
-        # Sample every few days to reduce computation
-        sample_interval = max(1, days // 100)
-        
-        for i in range(0, days, sample_interval):
-            date = start_date + timedelta(days=i)
-            
-            portfolio_value = 0.0
-            for symbol, position_info in positions.items():
-                quantity = position_info['quantity']
-                price = self.data_service.get_price_on_date(symbol, date)
-                
-                if price:
-                    portfolio_value += quantity * price
-            
-            # Add cash balance
-            portfolio_value += self.portfolio.get('cash_balance', 0)
-            
-            dates.append(date.strftime('%Y-%m-%d'))
-            values.append(round(portfolio_value, 2))
-        
-        # Calculate returns
-        if len(values) > 1:
-            total_return = values[-1] - values[0]
-            total_return_percent = (total_return / values[0]) * 100 if values[0] > 0 else 0
-        else:
-            total_return = 0
-            total_return_percent = 0
-        
-        return {
-            'timeframe': timeframe,
-            'dates': dates,
-            'values': values,
-            'total_return': round(total_return, 2),
-            'total_return_percent': round(total_return_percent, 2),
-            'start_value': values[0] if values else 0,
-            'end_value': values[-1] if values else 0
-        }
-    
-    def calculate_risk_metrics(self) -> Dict:
-        """Calculate portfolio risk metrics (Sharpe ratio, volatility, etc.)."""
-        positions = self.portfolio['positions']
-        
-        # Calculate portfolio returns
-        returns_data = {}
-        for symbol in positions.keys():
-            try:
-                returns = self.data_service.calculate_returns(symbol)
-                returns_data[symbol] = returns
-            except Exception as e:
-                self.logger.warning(f"Could not calculate returns for {symbol}: {e}")
-                continue
-        
-        if not returns_data:
+        if not db_positions:
+            self.logger.warning("No positions in portfolio")
             return {
-                'sharpe_ratio': 0,
-                'volatility': 0,
-                'max_drawdown': 0,
-                'beta': 0
+                'timeframe': timeframe,
+                'data': [],
+                'metrics': {
+                    'initial_value': cash_balance,
+                    'final_value': cash_balance,
+                    'total_return': 0.0,
+                    'volatility': 0.0,
+                    'sharpe_ratio': 0.0,
+                    'max_drawdown': 0.0
+                },
+                'warnings': ['No positions in portfolio']
             }
         
-        # Combine returns weighted by allocation
-        returns_df = pd.DataFrame(returns_data)
-        
-        # Get current allocations
-        summary = self.get_portfolio_summary()
-        weights = {}
-        for position in summary['positions']:
-            weights[position['symbol']] = position['allocation_percent'] / 100
-        
-        # Calculate weighted portfolio returns
-        portfolio_returns = pd.Series(0, index=returns_df.index)
-        for symbol, weight in weights.items():
-            if symbol in returns_df.columns:
-                portfolio_returns += returns_df[symbol] * weight
-        
-        # Calculate metrics
-        mean_return = portfolio_returns.mean()
-        volatility = portfolio_returns.std()
-        
-        # Sharpe Ratio (assuming risk-free rate = 0.05/252 daily)
-        risk_free_rate = 0.05 / 252
-        sharpe_ratio = (mean_return - risk_free_rate) / volatility if volatility > 0 else 0
-        
-        # Max Drawdown
-        cumulative_returns = (1 + portfolio_returns).cumprod()
-        running_max = cumulative_returns.expanding().max()
-        drawdown = (cumulative_returns - running_max) / running_max
-        max_drawdown = drawdown.min()
-        
-        return {
-            'annual_return': round(float(mean_return * 252 * 100), 2),
-            'volatility': round(float(volatility * np.sqrt(252) * 100), 2),
-            'sharpe_ratio': round(float(sharpe_ratio * np.sqrt(252)), 2),
-            'max_drawdown': round(float(max_drawdown * 100), 2)
-        }
-    
-    def add_position(self, symbol: str, quantity: int, price: float):
-        """Add or update a position."""
-        if symbol not in self.portfolio['positions']:
-            self.portfolio['positions'][symbol] = {
-                'quantity': quantity,
-                'avg_buy_price': price
+        # Convert to dict format for compatibility
+        positions = {}
+        for pos in db_positions:
+            positions[pos['symbol']] = {
+                'quantity': pos['quantity'],
+                'avg_buy_price': pos['avg_buy_price']
             }
-        else:
-            # Update average price
-            current = self.portfolio['positions'][symbol]
-            total_quantity = current['quantity'] + quantity
-            total_cost = (current['quantity'] * current['avg_buy_price']) + (quantity * price)
-            avg_price = total_cost / total_quantity
+        
+        try:
+            # Load price data for all symbols
+            price_data = {}
+            warnings = []
             
-            self.portfolio['positions'][symbol] = {
-                'quantity': total_quantity,
-                'avg_buy_price': avg_price
-            }
-        
-        self.portfolio['last_updated'] = datetime.now().isoformat()
-        self._save_portfolio(self.portfolio)
-    
-    def remove_position(self, symbol: str, quantity: int):
-        """Remove or reduce a position."""
-        if symbol in self.portfolio['positions']:
-            current_qty = self.portfolio['positions'][symbol]['quantity']
+            for symbol in positions.keys():
+                try:
+                    df = self.data_service.get_ohlcv_data(
+                        symbol, 
+                        start_date=start_date,
+                        end_date=end_date
+                    )
+                    if df.empty:
+                        warnings.append(f"No data for {symbol} in timeframe")
+                        continue
+                    price_data[symbol] = df[['Date', 'Close']].set_index('Date')
+                except Exception as e:
+                    warnings.append(f"Error loading {symbol}: {str(e)}")
+                    self.logger.error(f"Error loading {symbol}: {e}")
+                    continue
             
-            if quantity >= current_qty:
-                del self.portfolio['positions'][symbol]
+            if not price_data:
+                raise ValueError("No price data available for any symbols")
+            
+            # Combine all dates (inner join to only use dates where ALL symbols have data)
+            all_dates = None
+            for symbol, df in price_data.items():
+                if all_dates is None:
+                    all_dates = df.index
+                else:
+                    all_dates = all_dates.intersection(df.index)
+            
+            if len(all_dates) == 0:
+                raise ValueError("No common trading dates found for all symbols")
+            
+            all_dates = sorted(all_dates)
+            
+            # Calculate daily portfolio values
+            portfolio_values = []
+            for date in all_dates:
+                daily_value = cash_balance
+                
+                for symbol, position_info in positions.items():
+                    if symbol in price_data:
+                        quantity = position_info['quantity']
+                        try:
+                            price = float(price_data[symbol].loc[date, 'Close'])
+                            daily_value += quantity * price
+                        except KeyError:
+                            continue
+                
+                portfolio_values.append(daily_value)
+            
+            # Convert to pandas Series for calculations
+            portfolio_series = pd.Series(portfolio_values, index=all_dates)
+            
+            # Calculate metrics
+            initial_value = portfolio_values[0]
+            final_value = portfolio_values[-1]
+            
+            # Total return
+            total_return = ((final_value / initial_value) - 1) * 100 if initial_value > 0 else 0.0
+            
+            # Daily returns
+            daily_returns = portfolio_series.pct_change().dropna()
+            
+            # Annualized volatility
+            volatility = float(daily_returns.std() * np.sqrt(252) * 100) if len(daily_returns) > 1 else 0.0
+            
+            # Sharpe ratio (risk-free rate = 0)
+            if len(daily_returns) > 1 and daily_returns.std() > 0:
+                sharpe_ratio = float((daily_returns.mean() * 252) / (daily_returns.std() * np.sqrt(252)))
             else:
-                self.portfolio['positions'][symbol]['quantity'] = current_qty - quantity
+                sharpe_ratio = 0.0
             
-            self.portfolio['last_updated'] = datetime.now().isoformat()
-            self._save_portfolio(self.portfolio)
+            # Maximum drawdown
+            running_max = portfolio_series.expanding().max()
+            drawdowns = (portfolio_series - running_max) / running_max
+            max_drawdown = float(drawdowns.min() * 100) if len(drawdowns) > 0 else 0.0
+            
+            # Prepare time series data for response
+            data = [
+                {
+                    'date': date.strftime('%Y-%m-%d'),
+                    'value': round(float(value), 2)
+                }
+                for date, value in zip(all_dates, portfolio_values)
+            ]
+            
+            # Compile metrics
+            metrics = {
+                'initial_value': round(float(initial_value), 2),
+                'final_value': round(float(final_value), 2),
+                'total_return': round(float(total_return), 2),
+                'volatility': round(float(volatility), 2),
+                'sharpe_ratio': round(float(sharpe_ratio), 2),
+                'max_drawdown': round(float(max_drawdown), 2)
+            }
+            
+            response = {
+                'timeframe': timeframe,
+                'data': data,
+                'metrics': metrics
+            }
+            
+            if warnings:
+                response['warnings'] = warnings
+            
+            self.logger.info(f"Portfolio performance calculated for {timeframe}: {len(data)} data points")
+            return response
+            
+        except Exception as e:
+            self.logger.error(f"Error calculating portfolio performance: {e}", exc_info=True)
+            raise
+    
+    # DEPRECATED METHODS - These methods used old self.portfolio dict structure
+    # They are kept for backwards compatibility but should not be used
+    # Use database methods instead (db.save_portfolio, db.get_positions, etc.)
+    
+    # def calculate_risk_metrics(self) -> Dict:
+    #     """DEPRECATED: Calculate portfolio risk metrics."""
+    #     pass
+    
+    # def add_position(self, symbol: str, quantity: int, price: float):
+    #     """DEPRECATED: Add or update a position. Use db.save_portfolio instead."""
+    #     pass
+    
+    # def remove_position(self, symbol: str, quantity: int):
+    #     """DEPRECATED: Remove or reduce a position. Use db.save_portfolio instead."""
+    #     pass
 
 
 # Global instance

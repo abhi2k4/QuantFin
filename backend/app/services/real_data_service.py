@@ -129,6 +129,10 @@ class RealDataService:
         
         return prices
     
+    def get_available_symbols(self) -> List[str]:
+        """Get list of all available stock symbols."""
+        return self.symbols.copy()
+    
     def get_price_on_date(self, symbol: str, date: datetime) -> Optional[float]:
         """Get closing price for a symbol on a specific date."""
         try:
@@ -186,35 +190,34 @@ class RealDataService:
     def get_ohlcv_data(
         self, 
         symbol: str, 
-        last_n_days: Optional[int] = None
-    ) -> List[Dict]:
+        last_n_days: Optional[int] = None,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None
+    ) -> pd.DataFrame:
         """
-        Get OHLCV data for candlestick charts.
+        Get OHLCV data as DataFrame (enhanced for portfolio performance).
         
         Args:
             symbol: Stock symbol
             last_n_days: Number of recent days (if None, returns all)
+            start_date: Start date for filtering
+            end_date: End date for filtering
             
         Returns:
-            List of dicts with date, open, high, low, close, volume
+            DataFrame with Date, Open, High, Low, Close, Volume
         """
         df = self.load_stock_data(symbol)
+        
+        # Apply date filters
+        if start_date:
+            df = df[df['Date'] >= start_date]
+        if end_date:
+            df = df[df['Date'] <= end_date]
         
         if last_n_days:
             df = df.tail(last_n_days)
         
-        ohlcv = []
-        for _, row in df.iterrows():
-            ohlcv.append({
-                'date': row['Date'].strftime('%Y-%m-%d'),
-                'open': float(row['Open']),
-                'high': float(row['High']),
-                'low': float(row['Low']),
-                'close': float(row['Close']),
-                'volume': int(row['Volume'])
-            })
-        
-        return ohlcv
+        return df.reset_index(drop=True)
     
     def get_portfolio_value(
         self, 

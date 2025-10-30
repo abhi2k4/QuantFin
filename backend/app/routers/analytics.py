@@ -2,18 +2,19 @@
 API Router for Analytics and Model Performance
 
 This module provides REST API endpoints for accessing ML model performance
-metrics, training status, and candlestick data.
+metrics, training status, and candlestick data with REAL DATA integration.
 
 Author: QuantFin Team
-Date: 2025-10-10
+Date: 2025-10-30
 """
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, BackgroundTasks
 from typing import List, Dict, Any
 from pathlib import Path
 import logging
+import asyncio
 
-from app.services.ml_model_service import MLModelService, get_ml_service
+from app.services.ml_training_service import get_training_service
 from app.services.real_data_service import RealDataService
 
 # Configure logging
@@ -22,79 +23,164 @@ logger = logging.getLogger(__name__)
 # Create router
 router = APIRouter(prefix="/api/analytics", tags=["analytics"])
 
+# Get training service
+training_service = get_training_service()
 
-@router.get("/models")
-async def get_model_performance(
-    train: bool = Query(False, description="Force model training before returning metrics")
+
+def run_training_sync(force: bool):
+    """Synchronous wrapper to run async training in background."""
+    import sys
+    
+    try:
+        # Print to console immediately (bypasses logging buffer)
+        print("\n" + "=" * 80, flush=True)
+        print(f"🚀 STARTING MODEL TRAINING (force={force})", flush=True)
+        print("=" * 80 + "\n", flush=True)
+        
+        logger.info("=" * 80)
+        logger.info(f"🚀 STARTING MODEL TRAINING (force={force})")
+        logger.info("=" * 80)
+        
+        # Run async function in event loop
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        
+        print("📊 Training service initialized", flush=True)
+        print(f"🔄 Force retrain: {force}", flush=True)
+        print("⏳ This will take 30-60 seconds...", flush=True)
+        print("", flush=True)
+        
+        logger.info("📊 Training service initialized")
+        logger.info(f"🔄 Force retrain: {force}")
+        logger.info("⏳ This will take 30-60 seconds...")
+        logger.info("")
+        
+        result = loop.run_until_complete(training_service.train_all_models(force))
+        loop.close()
+        
+        print("", flush=True)
+        print("=" * 80, flush=True)
+        print("✅ MODEL TRAINING COMPLETED SUCCESSFULLY", flush=True)
+        print("=" * 80 + "\n", flush=True)
+        
+        logger.info("")
+        logger.info("=" * 80)
+        logger.info("✅ MODEL TRAINING COMPLETED SUCCESSFULLY")
+        logger.info("=" * 80)
+        
+        return result
+    except Exception as e:
+        error_msg = f"❌ TRAINING FAILED: {e}"
+        print("\n" + "=" * 80, flush=True)
+        print(error_msg, flush=True)
+        print("=" * 80 + "\n", flush=True)
+        
+        logger.error("=" * 80)
+        logger.error(error_msg)
+        logger.error("=" * 80)
+        logger.error("Full error:", exc_info=True)
+        training_service.training_status['status'] = 'failed'
+        training_service.training_status['error'] = str(e)
+        raise
+
+
+@router.post("/models/train")
+async def train_models(
+    background_tasks: BackgroundTasks,
+    force: bool = Query(False, description="Force retrain even if cache exists")
 ):
     """
-    Get ML model performance metrics.
+    Start training all ML models in the background.
+    
+    This endpoint initiates real model training with actual stock data.
+    Training runs asynchronously and takes 30-60 seconds.
+    Use GET /models/training-status to check progress.
     
     Args:
-        train: If True, trains all models before returning metrics (takes 30-60 seconds)
+        force: If True, ignore cache and retrain all models
+    
+    Returns:
+        Training job status
+    """
+    try:
+        # Check if already training
+        status = training_service.get_training_status()
+        if status['status'] == 'training':
+            return {
+                "message": "Training already in progress",
+                "status": status
+            }
+        
+        # Start training in background using sync wrapper
+        background_tasks.add_task(run_training_sync, force)
+        
+        logger.info(f"Queued background training task (force={force})")
+        
+        return {
+            "message": "Model training started",
+            "status": "training",
+            "estimated_time_seconds": 45
+        }
+        
+    except Exception as e:
+        logger.error(f"Error starting training: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/models/training-status")
+async def get_training_status():
+    """
+    Get current training status and progress.
+    
+    Returns:
+        Training status including progress percentage and current model
+    """
+    try:
+        status = training_service.get_training_status()
+        return status
+        
+    except Exception as e:
+        logger.error(f"Error getting training status: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/models")
+async def get_model_performance():
+    """
+    Get ML model performance metrics from cache or return cached results.
+    
+    If models haven't been trained, use POST /models/train to train them first.
     
     Returns:
         List of model performance metrics including accuracy, RMSE, MAE, R² score
     
     Example:
-        GET /api/analytics/models?train=false
+        GET /api/analytics/models
     """
     try:
-        # Return mock data for now until ML service is fully initialized
-        mock_models = [
-            {
-                "model": "LSTM",
-                "accuracy": 0.873,
-                "train_accuracy": 0.891,
-                "mae": 45.23,
-                "rmse": 67.89,
-                "r2_score": 0.782,
-                "training_samples": 5240,
-                "status": "trained"
-            },
-            {
-                "model": "Linear Regression",
-                "accuracy": 0.821,
-                "train_accuracy": 0.835,
-                "mae": 52.67,
-                "rmse": 78.34,
-                "r2_score": 0.698,
-                "training_samples": 5240,
-                "status": "trained"
-            },
-            {
-                "model": "SVM",
-                "accuracy": 0.895,
-                "train_accuracy": 0.907,
-                "mae": 38.91,
-                "rmse": 59.12,
-                "r2_score": 0.823,
-                "training_samples": 5240,
-                "status": "trained"
-            },
-            {
-                "model": "ARIMA",
-                "accuracy": 0.812,
-                "train_accuracy": 0.819,
-                "mae": 58.45,
-                "rmse": 82.76,
-                "r2_score": 0.671,
-                "training_samples": 5240,
-                "status": "trained"
-            }
-        ]
+        # Check for cached models
+        model_names = ["LSTM", "Linear Regression", "SVM", "ARIMA"]
+        models_data = []
         
-        if train:
-            logger.info("Training requested - returning updated mock data")
-            # Simulate slight improvement after training
-            for model in mock_models:
-                model['accuracy'] = min(0.99, model['accuracy'] + 0.01)
-                model['train_accuracy'] = min(0.99, model['train_accuracy'] + 0.01)
+        for model_name in model_names:
+            if training_service.is_cache_valid(model_name):
+                cached = training_service.load_cached_model(model_name)
+                if cached:
+                    models_data.append(cached)
         
-        return mock_models
+        if models_data:
+            logger.info(f"Returning {len(models_data)} cached models")
+            return {"models": models_data}
         
+        # No cached models - return empty with message
+        logger.warning("No trained models found. Client should call POST /models/train")
+        return {
+            "models": [],
+            "message": "No trained models available. Please train models first using POST /api/analytics/models/train"
+        }
+    
     except Exception as e:
-        logger.error(f"Error getting model performance: {e}")
+        logger.error(f"Error fetching model performance: {e}", exc_info=True)
         raise HTTPException(
             status_code=500,
             detail=f"Error retrieving model performance: {str(e)}"
@@ -122,28 +208,34 @@ async def get_candlestick_data(
     try:
         data_service = RealDataService()
         
-        # Get OHLCV data using the correct method and parameter name
-        ohlcv_list = data_service.get_ohlcv_data(symbol, last_n_days=days)
+        # Get OHLCV data as DataFrame
+        df = data_service.get_ohlcv_data(symbol, last_n_days=days)
         
-        if not ohlcv_list:
+        if df is None or df.empty:
             raise HTTPException(
                 status_code=404,
                 detail=f"No data found for symbol: {symbol}"
             )
         
-        # Data is already formatted as list of dicts
-        candlestick_data = ohlcv_list
+        # Rename columns to lowercase for frontend compatibility
+        df = df.rename(columns={
+            'Date': 'date',
+            'Open': 'open',
+            'High': 'high',
+            'Low': 'low',
+            'Close': 'close',
+            'Volume': 'volume'
+        })
         
-        # Calculate statistics from the list
-        highs = [item['high'] for item in ohlcv_list]
-        lows = [item['low'] for item in ohlcv_list]
-        volumes = [item['volume'] for item in ohlcv_list]
+        # Convert DataFrame to list of dicts
+        candlestick_data = df.to_dict('records')
         
+        # Calculate statistics from DataFrame
         stats = {
-            "high": max(highs),
-            "low": min(lows),
-            "avg_volume": int(sum(volumes) / len(volumes)),
-            "total_days": len(ohlcv_list)
+            "high": float(df['high'].max()),
+            "low": float(df['low'].min()),
+            "avg_volume": int(df['volume'].mean()),
+            "total_days": len(df)
         }
         
         return {

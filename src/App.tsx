@@ -15,6 +15,7 @@ import {
   LineChart
 } from 'lucide-react';
 import { Toaster } from 'sonner';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -25,12 +26,14 @@ import LandingPage from '@/pages/LandingPage';
 import Dashboard from '@/pages/Dashboard';
 import ModelInsights from '@/pages/ModelInsights';
 import BacktestResults from '@/pages/BacktestResults';
+import BacktestPage from '@/pages/BacktestPage';
 import SettingsPage from '@/pages/SettingsPage';
 import Solutions from '@/pages/Solutions';
 import Technology from '@/pages/Technology';
 import About from '@/pages/About';
 import Contact from '@/pages/Contact';
 import Signup from '@/pages/Signup';
+import Signin from '@/pages/Signin';
 import Privacy from '@/pages/Privacy';
 import Terms from '@/pages/Terms';
 import Disclaimer from '@/pages/Disclaimer';
@@ -145,11 +148,26 @@ function App() {
             <Link to="/contact" className="hidden md:block text-sm font-medium text-gray-400 hover:text-white transition-colors">
               Contact
             </Link>
-            <Link to="/signup">
-              <Button className="btn-primary px-6 py-2 text-sm rounded-xl">
-                Try QuantFin
-              </Button>
-            </Link>
+            
+            {/* Clerk Authentication */}
+            <SignedOut>
+              <Link to="/signup">
+                <Button className="btn-primary px-6 py-2 text-sm rounded-xl">
+                  Try QuantFin
+                </Button>
+              </Link>
+            </SignedOut>
+            <SignedIn>
+              <UserButton 
+                appearance={{
+                  elements: {
+                    avatarBox: 'w-10 h-10'
+                  }
+                }}
+                afterSignOutUrl="/"
+              />
+            </SignedIn>
+            
             <Button
               variant="ghost"
               size="icon"
@@ -236,7 +254,7 @@ function App() {
                   exit="exit"
                   transition={{ duration: 0.3 }}
                 >
-                  <BacktestResults />
+                  <BacktestPage />
                 </motion.div>
               }
             />
@@ -321,6 +339,20 @@ function App() {
                   transition={{ duration: 0.3 }}
                 >
                   <Signup />
+                </motion.div>
+              }
+            />
+            <Route
+              path="/signin"
+              element={
+                <motion.div
+                  variants={pageVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  transition={{ duration: 0.3 }}
+                >
+                  <Signin />
                 </motion.div>
               }
             />

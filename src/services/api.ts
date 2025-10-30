@@ -17,7 +17,7 @@ const getAuthToken = (): string | null => {
 // Create axios instance with default config
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000,
+  timeout: 60000, // Increased to 60 seconds for ML model operations
   headers: {
     'Content-Type': 'application/json',
   },
@@ -83,18 +83,71 @@ export interface PortfolioSummary {
 }
 
 export interface PortfolioPerformance {
-  dates: string[];
-  values: number[];
+  timeframe: string;
+  data: Array<{
+    date: string;
+    value: number;
+  }>;
+  metrics: {
+    initial_value: number;
+    final_value: number;
+    total_return: number;
+    volatility: number;
+    sharpe_ratio: number;
+    max_drawdown: number;
+  };
+  warnings?: string[];
 }
 
 export interface RebalanceRequest {
-  strategy: 'LSTM' | 'Linear' | 'Logistic' | 'SVM';
+  strategy: 'LSTM' | 'Linear' | 'Logistic' | 'SVM' | 'ARIMA';
   capital_allocation: number;
 }
 
+export interface AllocationRecommendation {
+  symbol: string;
+  weight_percent: number;
+  allocation_amount: number;
+  quantity: number;
+  buy_price: number;
+  predicted_price: number;
+  predicted_return: number;
+  confidence: number;
+  action: string;
+}
+
 export interface RebalanceResponse extends PortfolioSummary {
+  allocations: AllocationRecommendation[];
+  expected_return: number;
+  expected_risk: number;
+  sharpe_ratio?: number;
+  total_recommended_stocks?: number;
   message?: string;
   execution_time?: number;
+}
+
+export interface StrategyPerformance {
+  dates: string[];
+  values: number[];
+  total_return: number;
+  expected_return?: number;
+  expected_risk?: number;
+  sharpe_ratio?: number;
+  final_value: number;
+  top_stocks?: string[];
+}
+
+export interface StrategyComparisonResponse {
+  timeframe: string;
+  initial_capital: number;
+  strategies: {
+    LSTM: StrategyPerformance | null;
+    Linear: StrategyPerformance | null;
+    SVM: StrategyPerformance | null;
+    ARIMA: StrategyPerformance | null;
+    NIFTY50: StrategyPerformance | null;
+  };
+  timestamp: string;
 }
 
 // Analytics Types
@@ -136,7 +189,56 @@ export interface Recommendation {
   description: string;
 }
 
+// Predicted vs Actual Types
+export interface PredictedVsActualResponse {
+  stocks: Array<{
+    symbol: string;
+    predicted_return: number;
+    actual_return: number;
+    error: number;
+    confidence: number;
+  }>;
+  overall_accuracy: number;
+  avg_error: number;
+  strategy: string;
+  period: string;
+}
+
 // Backtest Types
+export interface BacktestRequest {
+  strategy: string;
+  start_date: string;
+  end_date: string;
+  capital: number;
+  top_n: number;
+  rebalance_frequency: string;
+}
+
+export interface BacktestResponse {
+  strategy_cagr: number;
+  strategy_sharpe: number;
+  strategy_sortino: number;
+  strategy_max_drawdown: number;
+  strategy_volatility: number;
+  strategy_calmar: number;
+  strategy_win_rate: number;
+  benchmark_cagr: number;
+  benchmark_sharpe: number;
+  benchmark_sortino: number;
+  benchmark_max_drawdown: number;
+  benchmark_volatility: number;
+  benchmark_calmar: number;
+  benchmark_win_rate: number;
+  dates: string[];
+  portfolio_values: number[];
+  benchmark_values: number[];
+  monthly_returns: number[];
+  initial_capital: number;
+  final_value: number;
+  num_rebalances: number;
+  total_periods: number;
+}
+
 export interface DailyResult {
   date: string;
   portfolio_value: number;
@@ -171,7 +273,8 @@ export interface BacktestResponse {
   warnings: string[];
 }
 
-export interface BacktestRequest {
+// Old backtest request (keeping for backward compatibility)
+export interface OldBacktestRequest {
   symbols: string[];
   start_date: string;
   end_date: string;
@@ -231,6 +334,25 @@ export const rebalancePortfolio = async (
   }
 };
 
+/**
+ * Get strategy comparison data for all ML models vs Nifty50
+ * GET /api/portfolio/strategy-comparison?timeframe=3M&capital=100000
+ */
+export const getStrategyComparison = async (
+  timeframe: '1M' | '3M' | '6M' | '1Y' = '3M',
+  capital: number = 100000
+): Promise<StrategyComparisonResponse> => {
+  try {
+    const response = await apiClient.get<StrategyComparisonResponse>('/portfolio/strategy-comparison', {
+      params: { timeframe, capital }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error rebalancing portfolio:', error);
+    throw error;
+  }
+};
+
 // ==================== ANALYTICS API ENDPOINTS ====================
 
 /**
@@ -251,12 +373,64 @@ export const getAnalyticsKPIs = async (): Promise<KPIData> => {
  * Get ML model performance metrics
  * GET /api/analytics/models?train=false
  */
-export const getModelPerformance = async (train: boolean = false): Promise<ModelPerformance[]> => {
+/**
+ * Start training all ML models in the background
+ * POST /api/analytics/models/train
+ */
+export const trainModels = async (force: boolean = false): Promise<{
+  message: string;
+  status: string;
+  estimated_time_seconds: number;
+}> => {
   try {
-    const response = await apiClient.get<ModelPerformance[]>('/analytics/models', {
-      params: { train }
+    const response = await apiClient.post('/analytics/models/train', null, {
+      params: { force }
     });
     return response.data;
+  } catch (error) {
+    console.error('Error starting model training:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get current training status and progress
+ * GET /api/analytics/models/training-status
+ */
+export const getTrainingStatus = async (): Promise<{
+  status: 'idle' | 'training' | 'completed' | 'failed';
+  progress: number;
+  current_model: string | null;
+  models_completed: string[];
+  error: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+}> => {
+  try {
+    const response = await apiClient.get('/analytics/models/training-status');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching training status:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get ML model performance metrics
+ * GET /api/analytics/models
+ */
+export const getModelPerformance = async (train: boolean = false): Promise<ModelPerformance[]> => {
+  try {
+    const response = await apiClient.get<{models: ModelPerformance[]} | ModelPerformance[]>('/analytics/models', {
+      params: { train }
+    });
+    // Handle both response formats
+    if (Array.isArray(response.data)) {
+      return response.data;
+    } else if ('models' in response.data) {
+      return response.data.models;
+    }
+    return [];
   } catch (error) {
     console.error('Error fetching model performance:', error);
     throw error;
@@ -404,6 +578,35 @@ export const getBacktestResults = async (
     return response.data;
   } catch (error) {
     console.error('Error fetching backtest results:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get predicted vs actual performance comparison
+ * GET /api/portfolio/predicted-vs-actual?days=90
+ */
+export const getPredictedVsActual = async (days: number = 90): Promise<PredictedVsActualResponse> => {
+  try {
+    const response = await apiClient.get<PredictedVsActualResponse>('/portfolio/predicted-vs-actual', {
+      params: { days }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching predicted vs actual:', error);
+    throw error;
+  }
+};
+
+// Update cash balance
+export const updateCashBalance = async (cashBalance: number): Promise<{ success: boolean; cash_balance: number; message: string }> => {
+  try {
+    const response = await apiClient.put('/portfolio/cash-balance', {
+      cash_balance: cashBalance
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating cash balance:', error);
     throw error;
   }
 };

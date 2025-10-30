@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
-  LineChart,
   Line,
   BarChart,
   Bar,
@@ -22,8 +21,6 @@ import {
   Zap,
   Target,
   Award,
-  ArrowUpRight,
-  ArrowDownRight,
   Loader2
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -33,13 +30,10 @@ import { toast } from 'sonner';
 import { 
   getModelPerformance, 
   getCandlestickData, 
-  getBacktestResults, 
   trainModels,
   getTrainingStatus,
   getErrorMessage 
 } from '@/services/api';
-
-type ModelType = 'LSTM' | 'Linear Regression' | 'SVM' | 'ARIMA';
 
 interface ModelMetrics {
   model: string;
@@ -73,7 +67,7 @@ export default function Analytics() {
   const [models, setModels] = useState<ModelMetrics[]>([]);
   const [candlestickData, setCandlestickData] = useState<CandlestickData[]>([]);
   const [selectedSymbol, setSelectedSymbol] = useState('RELIANCE');
-  const [selectedModel, setSelectedModel] = useState<ModelType>('LSTM');
+  const [stockSearch, setStockSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [candlestickLoading, setCandlestickLoading] = useState(false);
   const [trainingStatus, setTrainingStatus] = useState<TrainingStatus>({
@@ -86,7 +80,20 @@ export default function Analytics() {
   
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const symbols = ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'ICICIBANK', 'SBIN'];
+  // All Nifty 50 stocks available in the backend (48 stocks)
+  const symbols = [
+    'ADANIENT', 'ADANIPORTS', 'ASIANPAINT', 'AXISBANK', 'BAJAJ-AUTO', 'BAJAJFINSV', 
+    'BAJFINANCE', 'BHARTIARTL', 'BPCL', 'BRITANNIA', 'CIPLA', 'COALINDIA', 
+    'DIVISLAB', 'DRREDDY', 'EICHERMOT', 'GRASIM', 'HCLTECH', 'HDFCBANK', 
+    'HEROMOTOCO', 'HINDALCO', 'HINDUNILVR', 'ICICIBANK', 'INDUSINDBK', 'INFY', 
+    'ITC', 'JSWSTEEL', 'KOTAKBANK', 'LT', 'LTIM', 'MARUTI', 
+    'NESTLEIND', 'NTPC', 'ONGC', 'POWERGRID', 'RELIANCE', 'SBILIFE', 
+    'SBIN', 'SHREECEM', 'SUNPHARMA', 'TATACONSUM', 'TATAMOTORS', 'TATASTEEL', 
+    'TCS', 'TECHM', 'TITAN', 'ULTRACEMCO', 'UPL', 'WIPRO'
+  ];
+
+  // Popular stocks for quick access
+  const popularStocks = ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'ICICIBANK', 'SBIN', 'ITC', 'BHARTIARTL'];
 
   useEffect(() => {
     loadModels();
@@ -389,24 +396,66 @@ export default function Analytics() {
           transition={{ delay: 0.3 }}
         >
           <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                <TrendingUp className="w-6 h-6 text-green-400" />
-                Price Action - {selectedSymbol}
-              </h2>
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                  <TrendingUp className="w-6 h-6 text-green-400" />
+                  Price Action - {selectedSymbol}
+                </h2>
+                
+                {/* Search Input */}
+                <input
+                  type="text"
+                  placeholder="Search stocks..."
+                  value={stockSearch}
+                  onChange={(e) => setStockSearch(e.target.value.toUpperCase())}
+                  className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
+                />
+              </div>
+
+              {/* Popular Stocks Quick Access */}
+              {stockSearch === '' && (
+                <div className="mb-3">
+                  <p className="text-sm text-gray-400 mb-2">Popular:</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {popularStocks.map(symbol => (
+                      <Button
+                        key={symbol}
+                        onClick={() => handleSymbolChange(symbol)}
+                        variant={selectedSymbol === symbol ? 'default' : 'outline'}
+                        size="sm"
+                        className={`${selectedSymbol === symbol ? 'bg-blue-600 hover:bg-blue-700' : 'hover:bg-white/10'}`}
+                      >
+                        {symbol}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
               
-              <div className="flex gap-2">
-                {symbols.map(symbol => (
+              {/* All Stocks - Scrollable Selector */}
+              <div>
+                <p className="text-sm text-gray-400 mb-2">
+                  All Stocks ({symbols.filter(symbol => symbol.includes(stockSearch)).length}):
+                </p>
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+                  {symbols
+                    .filter(symbol => symbol.includes(stockSearch))
+                    .map(symbol => (
                   <Button
                     key={symbol}
                     onClick={() => handleSymbolChange(symbol)}
                     variant={selectedSymbol === symbol ? 'default' : 'outline'}
                     size="sm"
-                    className={selectedSymbol === symbol ? 'bg-blue-600' : ''}
+                    className={`whitespace-nowrap flex-shrink-0 ${selectedSymbol === symbol ? 'bg-blue-600 hover:bg-blue-700' : 'hover:bg-white/10'}`}
                   >
                     {symbol}
                   </Button>
                 ))}
+                {symbols.filter(symbol => symbol.includes(stockSearch)).length === 0 && (
+                  <p className="text-gray-400 text-sm">No stocks found</p>
+                )}
+                </div>
               </div>
             </div>
 
@@ -497,233 +546,6 @@ export default function Analytics() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          {/* ETF vs Nifty50 Performance Comparison */}
-          <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6">
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-              <TrendingUp className="w-6 h-6 text-green-400" />
-              Portfolio Performance vs Nifty50 (5-Year CAGR Analysis)
-            </h2>
-
-            <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-              <p className="text-sm text-gray-300">
-                <strong className="text-white">Note:</strong> The following projections are based on our actual ML model accuracies and historical performance. 
-                Linear Regression (91% accuracy) is our best-performing model, followed by LSTM (75%), ARIMA (65%), and SVM (28%).
-              </p>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Strategy</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Model Accuracy</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Current (₹)</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">5Y Projected (₹)</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">CAGR %</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* Linear Regression - Best Model */}
-                  <motion.tr
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="border-b border-white/5 hover:bg-white/5 transition-colors"
-                  >
-                    <td className="py-4 px-4 font-semibold text-white">
-                      <div className="flex items-center gap-2">
-                        <Award className="w-5 h-5 text-yellow-400" />
-                        Linear Regression Portfolio (Best)
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 text-right">
-                      <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-sm font-semibold">
-                        91%
-                      </span>
-                    </td>
-                    <td className="py-4 px-4 text-right text-gray-300 font-medium">
-                      100,000
-                    </td>
-                    <td className="py-4 px-4 text-right text-green-400 font-bold text-lg">
-                      165,789
-                    </td>
-                    <td className="py-4 px-4 text-right">
-                      <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full font-bold">
-                        10.67%
-                      </span>
-                    </td>
-                  </motion.tr>
-
-                  {/* LSTM */}
-                  <motion.tr
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.15 }}
-                    className="border-b border-white/5 hover:bg-white/5 transition-colors"
-                  >
-                    <td className="py-4 px-4 font-medium text-white">
-                      <div className="flex items-center gap-2">
-                        <Brain className="w-5 h-5 text-purple-400" />
-                        LSTM Portfolio
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 text-right">
-                      <span className="px-2 py-1 bg-purple-500/20 text-purple-400 rounded text-sm font-semibold">
-                        75%
-                      </span>
-                    </td>
-                    <td className="py-4 px-4 text-right text-gray-300 font-medium">
-                      100,000
-                    </td>
-                    <td className="py-4 px-4 text-right text-green-400 font-semibold">
-                      148,024
-                    </td>
-                    <td className="py-4 px-4 text-right">
-                      <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full font-semibold">
-                        8.16%
-                      </span>
-                    </td>
-                  </motion.tr>
-
-                  {/* ARIMA */}
-                  <motion.tr
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="border-b border-white/5 hover:bg-white/5 transition-colors"
-                  >
-                    <td className="py-4 px-4 font-medium text-white">
-                      <div className="flex items-center gap-2">
-                        <Activity className="w-5 h-5 text-orange-400" />
-                        ARIMA Portfolio
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 text-right">
-                      <span className="px-2 py-1 bg-orange-500/20 text-orange-400 rounded text-sm font-semibold">
-                        65%
-                      </span>
-                    </td>
-                    <td className="py-4 px-4 text-right text-gray-300 font-medium">
-                      100,000
-                    </td>
-                    <td className="py-4 px-4 text-right text-blue-400 font-medium">
-                      128,403
-                    </td>
-                    <td className="py-4 px-4 text-right">
-                      <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full font-medium">
-                        5.12%
-                      </span>
-                    </td>
-                  </motion.tr>
-
-                  {/* SVM */}
-                  <motion.tr
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.25 }}
-                    className="border-b border-white/5 hover:bg-white/5 transition-colors"
-                  >
-                    <td className="py-4 px-4 font-medium text-gray-400">
-                      <div className="flex items-center gap-2">
-                        <BarChart3 className="w-5 h-5 text-red-400" />
-                        SVM Portfolio
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 text-right">
-                      <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded text-sm font-semibold">
-                        28%
-                      </span>
-                    </td>
-                    <td className="py-4 px-4 text-right text-gray-300 font-medium">
-                      100,000
-                    </td>
-                    <td className="py-4 px-4 text-right text-gray-400 font-medium">
-                      103,782
-                    </td>
-                    <td className="py-4 px-4 text-right">
-                      <span className="px-3 py-1 bg-gray-500/20 text-gray-400 rounded-full font-medium">
-                        0.74%
-                      </span>
-                    </td>
-                  </motion.tr>
-
-                  {/* Nifty 50 Benchmark */}
-                  <motion.tr
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="border-t-2 border-white/20 bg-white/5"
-                  >
-                    <td className="py-4 px-4 font-semibold text-gray-300">
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-blue-300" />
-                        Nifty 50 Index (Benchmark)
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 text-right">
-                      <span className="px-2 py-1 bg-gray-500/20 text-gray-400 rounded text-sm">
-                        N/A
-                      </span>
-                    </td>
-                    <td className="py-4 px-4 text-right text-gray-300 font-medium">
-                      100,000
-                    </td>
-                    <td className="py-4 px-4 text-right text-gray-400 font-medium">
-                      112,616
-                    </td>
-                    <td className="py-4 px-4 text-right">
-                      <span className="px-3 py-1 bg-gray-500/20 text-gray-400 rounded-full font-medium">
-                        2.40%
-                      </span>
-                    </td>
-                  </motion.tr>
-                </tbody>
-              </table>
-
-              {/* Performance Insights */}
-              <div className="mt-6 p-4 bg-gradient-to-r from-green-500/10 to-purple-500/10 border border-green-500/20 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <Award className="w-6 h-6 text-green-400 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="text-lg font-semibold text-white mb-2">Why Linear Regression Portfolio Wins</h3>
-                    <ul className="space-y-2 text-sm text-gray-300">
-                      <li className="flex items-start gap-2">
-                        <ArrowUpRight className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
-                        <span><strong className="text-white">Highest Accuracy:</strong> 91% test accuracy on real NSE data, validated across 60,000+ historical samples</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <ArrowUpRight className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
-                        <span><strong className="text-white">Dynamic Rebalancing:</strong> Continuously analyzes 49 stocks and rebalances based on predicted returns, unlike Nifty50's static market-cap weighting</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <ArrowUpRight className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
-                        <span><strong className="text-white">Linear Trends Work:</strong> Stock prices often follow linear patterns over medium-term horizons, making linear regression ideal for trend capture</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <ArrowUpRight className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
-                        <span><strong className="text-white">Real Data Training:</strong> Trained on 7+ years of actual NSE historical data, not synthetic backtests</span>
-                      </li>
-                    </ul>
-                    <div className="mt-4 pt-4 border-t border-white/10">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-400">Best Model vs Nifty50:</span>
-                        <span className="text-2xl font-bold text-green-400">+8.27% CAGR</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm mt-2">
-                        <span className="text-gray-400">5-Year Excess Return:</span>
-                        <span className="text-xl font-bold text-green-400">+₹53,173</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm mt-2 pt-2 border-t border-white/5">
-                        <span className="text-gray-400">Model Ranking (by CAGR):</span>
-                        <span className="text-sm text-gray-300">Linear (10.67%) → LSTM (8.16%) → ARIMA (5.12%) → Nifty50 (2.40%) → SVM (0.74%)</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-
           <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
               <Target className="w-6 h-6 text-orange-400" />

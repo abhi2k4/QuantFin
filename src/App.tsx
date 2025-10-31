@@ -37,7 +37,7 @@ import Signin from '@/pages/Signin';
 import Privacy from '@/pages/Privacy';
 import Terms from '@/pages/Terms';
 import Disclaimer from '@/pages/Disclaimer';
-import Analytics from '@/pages/Analytics';
+import Analytics from '@/pages/dashboard/Analytics';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },

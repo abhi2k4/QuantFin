@@ -47,7 +47,7 @@ class PortfolioManager:
         self.db.save_portfolio(
             positions=default_positions,
             metadata={
-                'cash_balance': 10000000.0,  # 1 Crore (10M)
+                'cash_balance': 1000000.0,  # 10 Lakhs (1M)
                 'total_invested': 187500.0,
                 'strategy': 'MANUAL',
                 'expected_return': 0.0,

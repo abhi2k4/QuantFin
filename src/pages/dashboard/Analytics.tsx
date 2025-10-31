@@ -1,40 +1,30 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-  Line,
   BarChart,
   Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Area,
-  AreaChart
+  ResponsiveContainer
 } from 'recharts';
 import {
   TrendingUp,
-  TrendingDown,
   Activity,
   Target,
   BarChart3,
   Loader2,
   ChevronDown,
   Sparkles,
-  ShieldCheck,
-  AlertCircle
+  ShieldCheck
 } from 'lucide-react';
 import {
   getAnalyticsKPIs,
   getModelPerformance,
-  getStockPrediction,
-  getRecommendations,
   getErrorMessage,
   type KPIData,
-  type ModelPerformance,
-  type StockPrediction,
-  type Recommendation
+  type ModelPerformance
 } from '@/services/api';
 import { toast } from 'sonner';
 
@@ -54,25 +44,16 @@ export default function Analytics() {
   // Data state
   const [kpis, setKpis] = useState<KPIData | null>(null);
   const [modelPerf, setModelPerf] = useState<ModelPerformance[]>([]);
-  const [stockData, setStockData] = useState<StockPrediction | null>(null);
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
 
   // Loading states
   const [loadingKPIs, setLoadingKPIs] = useState(true);
   const [loadingModels, setLoadingModels] = useState(true);
-  const [loadingStock, setLoadingStock] = useState(true);
-  const [loadingRecs, setLoadingRecs] = useState(true);
 
   // Fetch data on mount and when filters change
   useEffect(() => {
     loadKPIs();
     loadModelPerformance();
-    loadRecommendations();
   }, [timeframe]);
-
-  useEffect(() => {
-    loadStockPrediction();
-  }, [selectedStock, timeframe]);
 
   const loadKPIs = async () => {
     setLoadingKPIs(true);
@@ -97,32 +78,6 @@ export default function Analytics() {
       toast.error(getErrorMessage(error));
     } finally {
       setLoadingModels(false);
-    }
-  };
-
-  const loadStockPrediction = async () => {
-    setLoadingStock(true);
-    try {
-      const data = await getStockPrediction(selectedStock, timeframe);
-      setStockData(data);
-    } catch (error) {
-      console.error('Error loading stock prediction:', error);
-      toast.error(getErrorMessage(error));
-    } finally {
-      setLoadingStock(false);
-    }
-  };
-
-  const loadRecommendations = async () => {
-    setLoadingRecs(true);
-    try {
-      const data = await getRecommendations();
-      setRecommendations(data);
-    } catch (error) {
-      console.error('Error loading recommendations:', error);
-      toast.error(getErrorMessage(error));
-    } finally {
-      setLoadingRecs(false);
     }
   };
 
@@ -204,19 +159,6 @@ export default function Analytics() {
         <ModelPerformanceSection
           data={modelPerf}
           loading={loadingModels}
-        />
-
-        {/* Stock Prediction vs Actual */}
-        <StockPredictionSection
-          data={stockData}
-          selectedModel={selectedModel}
-          loading={loadingStock}
-        />
-
-        {/* Recommendations */}
-        <RecommendationsSection
-          data={recommendations}
-          loading={loadingRecs}
         />
       </div>
     </div>
@@ -432,9 +374,9 @@ function ModelPerformanceSection({ data, loading }: ModelPerformanceSectionProps
               <tr className="border-b border-white/10">
                 <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Model</th>
                 <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Accuracy</th>
-                <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Return</th>
                 <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">MAE</th>
                 <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">RMSE</th>
+                <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">R² Score</th>
               </tr>
             </thead>
             <tbody>
@@ -448,251 +390,13 @@ function ModelPerformanceSection({ data, loading }: ModelPerformanceSectionProps
                 >
                   <td className="py-3 px-4 font-medium">{model.model}</td>
                   <td className="py-3 px-4 text-right">{model.accuracy}%</td>
-                  <td className="py-3 px-4 text-right text-green-500">{model.return}%</td>
                   <td className="py-3 px-4 text-right text-gray-400">{model.mae}</td>
                   <td className="py-3 px-4 text-right text-gray-400">{model.rmse}</td>
+                  <td className="py-3 px-4 text-right text-gray-400">{model.r2_score}</td>
                 </motion.tr>
               ))}
             </tbody>
           </table>
-        </div>
-      )}
-    </motion.div>
-  );
-}
-
-// ==================== STOCK PREDICTION SECTION ====================
-
-interface StockPredictionSectionProps {
-  data: StockPrediction | null;
-  selectedModel: ModelType;
-  loading: boolean;
-}
-
-function StockPredictionSection({ data, selectedModel, loading }: StockPredictionSectionProps) {
-  // Prepare chart data
-  const chartData = data
-    ? data.dates.map((date, index) => ({
-        date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        actual: data.actual_prices[index],
-        predicted:
-          selectedModel === 'All'
-            ? null
-            : data.predicted_prices[selectedModel as keyof typeof data.predicted_prices]?.[index],
-        LSTM: selectedModel === 'All' ? data.predicted_prices.LSTM[index] : null,
-        Linear: selectedModel === 'All' ? data.predicted_prices.Linear[index] : null,
-        Logistic: selectedModel === 'All' ? data.predicted_prices.Logistic[index] : null,
-        SVM: selectedModel === 'All' ? data.predicted_prices.SVM[index] : null
-      }))
-    : [];
-
-  // Sample every nth data point for better visualization (show ~30 points max)
-  const sampleRate = Math.ceil(chartData.length / 30);
-  const sampledData = chartData.filter((_, index) => index % sampleRate === 0);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4 }}
-      className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6"
-    >
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-bold">Stock Predictions vs Actual</h2>
-          <p className="text-sm text-gray-400 mt-1">
-            {data?.symbol} • {selectedModel === 'All' ? 'All Models' : `${selectedModel} Model`}
-          </p>
-        </div>
-      </div>
-
-      {loading ? (
-        <div className="h-[400px] flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-        </div>
-      ) : (
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={selectedModel}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
-          >
-            <ResponsiveContainer width="100%" height={400}>
-              <AreaChart data={sampledData}>
-                <defs>
-                  <linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="predictedGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                    <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                <XAxis
-                  dataKey="date"
-                  stroke="#666"
-                  tick={{ fill: '#999', fontSize: 12 }}
-                />
-                <YAxis stroke="#666" tick={{ fill: '#999' }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(0,0,0,0.95)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '12px',
-                    backdropFilter: 'blur(20px)'
-                  }}
-                  labelStyle={{ color: '#fff', marginBottom: '8px' }}
-                />
-                <Legend wrapperStyle={{ paddingTop: '20px' }} />
-
-                {/* Actual Price */}
-                <Area
-                  type="monotone"
-                  dataKey="actual"
-                  stroke="#3b82f6"
-                  strokeWidth={2}
-                  fill="url(#actualGradient)"
-                  name="Actual Price"
-                />
-
-                {/* Predicted Price(s) */}
-                {selectedModel !== 'All' && (
-                  <Area
-                    type="monotone"
-                    dataKey="predicted"
-                    stroke="#8b5cf6"
-                    strokeWidth={2}
-                    fill="url(#predictedGradient)"
-                    strokeDasharray="5 5"
-                    name={`${selectedModel} Prediction`}
-                  />
-                )}
-
-                {selectedModel === 'All' && (
-                  <>
-                    <Line type="monotone" dataKey="LSTM" stroke="#8b5cf6" strokeWidth={2} dot={false} name="LSTM" />
-                    <Line type="monotone" dataKey="Linear" stroke="#10b981" strokeWidth={2} dot={false} name="Linear" />
-                    <Line type="monotone" dataKey="Logistic" stroke="#f59e0b" strokeWidth={2} dot={false} name="Logistic" />
-                    <Line type="monotone" dataKey="SVM" stroke="#ef4444" strokeWidth={2} dot={false} name="SVM" />
-                  </>
-                )}
-              </AreaChart>
-            </ResponsiveContainer>
-          </motion.div>
-        </AnimatePresence>
-      )}
-    </motion.div>
-  );
-}
-
-// ==================== RECOMMENDATIONS SECTION ====================
-
-interface RecommendationsSectionProps {
-  data: Recommendation[];
-  loading: boolean;
-}
-
-function RecommendationsSection({ data, loading }: RecommendationsSectionProps) {
-  const getActionColor = (action: string) => {
-    switch (action) {
-      case 'Buy':
-        return 'from-green-500 to-emerald-600';
-      case 'Hold':
-        return 'from-blue-500 to-cyan-600';
-      case 'Sell':
-        return 'from-red-500 to-orange-600';
-      default:
-        return 'from-gray-500 to-gray-600';
-    }
-  };
-
-  const getActionIcon = (action: string) => {
-    switch (action) {
-      case 'Buy':
-        return <TrendingUp className="w-5 h-5" />;
-      case 'Hold':
-        return <ShieldCheck className="w-5 h-5" />;
-      case 'Sell':
-        return <TrendingDown className="w-5 h-5" />;
-      default:
-        return <AlertCircle className="w-5 h-5" />;
-    }
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5 }}
-      className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6"
-    >
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-bold">Model Recommendations</h2>
-          <p className="text-sm text-gray-400 mt-1">AI-driven trading suggestions based on model performance</p>
-        </div>
-      </div>
-
-      {loading ? (
-        <div className="h-[200px] flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {data.map((rec, index) => (
-            <motion.div
-              key={rec.model}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="rounded-xl bg-white/5 border border-white/10 p-5 hover:border-white/20 transition-all hover:shadow-lg"
-            >
-              {/* Header */}
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${getActionColor(rec.action)} flex items-center justify-center`}>
-                    {getActionIcon(rec.action)}
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">{rec.model}</h3>
-                    <p className="text-xs text-gray-400">ML Model</p>
-                  </div>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${getActionColor(rec.action)}`}>
-                  {rec.action}
-                </div>
-              </div>
-
-              {/* Metrics */}
-              <div className="grid grid-cols-2 gap-3 mb-3">
-                <div>
-                  <p className="text-xs text-gray-400">Return</p>
-                  <p className="text-lg font-bold text-green-500">{rec.return}%</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Confidence</p>
-                  <p className="text-lg font-bold">{(rec.confidence * 100).toFixed(0)}%</p>
-                </div>
-              </div>
-
-              {/* Description */}
-              <p className="text-sm text-gray-400 leading-relaxed">{rec.description}</p>
-
-              {/* Confidence Bar */}
-              <div className="mt-4 h-2 bg-white/5 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${rec.confidence * 100}%` }}
-                  transition={{ delay: index * 0.1 + 0.3, duration: 0.8 }}
-                  className={`h-full bg-gradient-to-r ${getActionColor(rec.action)}`}
-                />
-              </div>
-            </motion.div>
-          ))}
         </div>
       )}
     </motion.div>

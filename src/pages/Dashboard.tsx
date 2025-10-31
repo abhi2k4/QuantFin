@@ -242,13 +242,13 @@ export default function Dashboard() {
               <p className="text-sm text-gray-400 mt-1">Real-time portfolio management & insights</p>
             </div>
             <div className="flex gap-3">
-              <Button
+              {/* <Button
                 onClick={() => navigate('/analytics')}
                 className="rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0"
               >
                 <BrainCircuit className="w-4 h-4 mr-2" />
                 ML Analytics
-              </Button>
+              </Button> */}
               <Button
                 onClick={() => navigate('/backtest')}
                 className="rounded-xl bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white border-0"

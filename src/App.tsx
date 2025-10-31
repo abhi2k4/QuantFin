@@ -11,8 +11,8 @@ import {
   Lightbulb,
   Cpu,
   Users,
-  BarChart3,
-  LineChart
+  BarChart3
+  // LineChart
 } from 'lucide-react';
 import { Toaster } from 'sonner';
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
@@ -37,11 +37,11 @@ import Signin from '@/pages/Signin';
 import Privacy from '@/pages/Privacy';
 import Terms from '@/pages/Terms';
 import Disclaimer from '@/pages/Disclaimer';
-import Analytics from '@/pages/dashboard/Analytics';
+// import Analytics from '@/pages/dashboard/Analytics';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-  { icon: LineChart, label: 'Analytics', path: '/analytics' },
+  // { icon: LineChart, label: 'Analytics', path: '/analytics' },
   { icon: Brain, label: 'Models', path: '/models' },
   { icon: BarChart3, label: 'Backtest', path: '/backtest' },
   { icon: Lightbulb, label: 'Solutions', path: '/solutions' },
@@ -230,7 +230,7 @@ function App() {
                 </motion.div>
               }
             />
-            <Route
+            {/* <Route
               path="/analytics"
               element={
                 <motion.div
@@ -243,7 +243,7 @@ function App() {
                   <Analytics />
                 </motion.div>
               }
-            />
+            /> */}
             <Route
               path="/backtest"
               element={
@@ -384,7 +384,7 @@ function App() {
                 </motion.div>
               }
             />
-            <Route
+            {/* <Route
               path="/dashboard/analytics"
               element={
                 <motion.div
@@ -397,7 +397,7 @@ function App() {
                   <Analytics />
                 </motion.div>
               }
-            />
+            /> */}
             <Route
               path="/disclaimer"
               element={

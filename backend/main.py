@@ -139,6 +139,7 @@ async def startup_event():
     try:
         # Trigger data loading by accessing the preprocessor
         from app.services.data_preprocessor import DataPreprocessor
+        from app.routers.predictions import initialize_prediction_services
         preprocessor = DataPreprocessor()
         
         # Get available symbols to verify data loading
@@ -147,6 +148,10 @@ async def startup_event():
         
         if len(available_symbols) > 0:
             logger.info(f"Sample symbols: {', '.join(available_symbols[:5])}")
+
+        # Initialize prediction services once data is available
+        initialize_prediction_services()
+        logger.info("Prediction services initialized successfully")
         
         logger.info("Data preprocessing initialized successfully")
         

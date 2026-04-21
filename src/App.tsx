@@ -15,7 +15,7 @@ import {
   // LineChart
 } from 'lucide-react';
 import { Toaster } from 'sonner';
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@/lib/clerk';
 
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';

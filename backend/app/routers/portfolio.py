@@ -171,12 +171,6 @@ async def get_portfolio_performance(
             status_code=500,
             detail=f"Failed to fetch portfolio performance: {str(e)}"
         )
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to fetch portfolio performance: {str(e)}"
-        )
 
 
 @router.post("/rebalance")
@@ -294,13 +288,12 @@ async def get_strategy_comparison(
     try:
         # Check cache first
         cached_result = get_cached_strategy_comparison(timeframe, capital)
-        if cached_result:
+        if cached_result and cached_result.get('strategies', {}).get('NIFTY50'):
             return cached_result
         
         from app.services.portfolio_allocator import get_portfolio_allocator
         from app.services.real_data_service import get_real_data_service
         import pandas as pd
-        import numpy as np
         
         allocator = get_portfolio_allocator()
         data_service = get_real_data_service()
@@ -433,7 +426,6 @@ async def get_strategy_comparison(
             except Exception as e:
                 logger.error(f"Error calculating {strategy} performance: {e}", exc_info=True)
                 results[strategy] = None
-        
         response_data = {
             'timeframe': timeframe,
             'initial_capital': capital,

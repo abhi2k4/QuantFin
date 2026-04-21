@@ -30,10 +30,16 @@ def initialize_prediction_services():
     global preprocessor, feature_engineer, prediction_service
     
     preprocessor = DataPreprocessor()
-    preprocessor.load_data("backend/data")
     
     feature_engineer = FeatureEngineer(preprocessor)
     prediction_service = PredictionService(feature_engineer)
+
+
+def ensure_prediction_services_initialized():
+    """Lazy-initialize prediction services if not already initialized."""
+    global prediction_service
+    if prediction_service is None:
+        initialize_prediction_services()
 
 
 @router.get("/symbols")
@@ -44,8 +50,10 @@ async def get_available_symbols():
     Returns:
         Dict with available symbols per model type
     """
-    if prediction_service is None:
-        raise HTTPException(status_code=503, detail="Prediction service not initialized")
+    try:
+        ensure_prediction_services_initialized()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Prediction service not initialized: {str(e)}")
     
     # Check which models are available for which symbols
     available_models = {
@@ -87,8 +95,10 @@ async def predict_symbols(
     Example:
         POST /api/predictions/predict?symbols=RELIANCE&symbols=TCS&model=ensemble&horizon=21
     """
-    if prediction_service is None:
-        raise HTTPException(status_code=503, detail="Prediction service not initialized")
+    try:
+        ensure_prediction_services_initialized()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Prediction service not initialized: {str(e)}")
     
     # Validate symbols
     if not symbols:
@@ -149,8 +159,10 @@ async def generate_portfolio(
     Example:
         POST /api/predictions/portfolio?symbols=RELIANCE&symbols=TCS&strategy=model_weighted
     """
-    if prediction_service is None:
-        raise HTTPException(status_code=503, detail="Prediction service not initialized")
+    try:
+        ensure_prediction_services_initialized()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Prediction service not initialized: {str(e)}")
     
     # Validate strategy
     valid_strategies = ['model_weighted', 'mean_variance', 'risk_parity']
@@ -268,6 +280,11 @@ async def prediction_service_health():
     Returns:
         Service health status
     """
+    try:
+        ensure_prediction_services_initialized()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Prediction service not initialized: {str(e)}")
+
     status = {
         'service': 'predictions',
         'status': 'healthy' if prediction_service is not None else 'unhealthy',

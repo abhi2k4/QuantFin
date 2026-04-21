@@ -276,12 +276,29 @@ async def get_analytics_kpis():
         Portfolio KPIs including return, risk, volatility, sharpe ratio
     """
     try:
-        # TODO: Implement real KPI calculation from portfolio
+        from app.services.portfolio_manager import get_portfolio_manager
+
+        portfolio_manager = get_portfolio_manager()
+
+        # Use real computed performance metrics from historical portfolio data
+        perf_1y = portfolio_manager.get_portfolio_performance("1Y")
+        summary = portfolio_manager.get_portfolio_summary()
+
+        metrics = perf_1y.get("metrics", {})
+        total_return = float(metrics.get("total_return", 0.0))
+        volatility = float(metrics.get("volatility", 0.0))
+        sharpe_ratio = float(metrics.get("sharpe_ratio", 0.0))
+
+        # Simple risk score proxy from volatility (percentage -> decimal)
+        risk_metric = round(max(0.0, min(1.0, volatility / 100.0)), 4)
+
         return {
-            "portfolio_return": 0.152,
-            "risk_metric": 0.082,
-            "volatility": 0.214,
-            "sharpe_ratio": 0.71
+            "portfolio_return": round(total_return / 100.0, 4),
+            "risk_metric": risk_metric,
+            "volatility": round(volatility / 100.0, 4),
+            "sharpe_ratio": round(sharpe_ratio, 4),
+            "total_value": float(summary.get("total_value", 0.0)),
+            "cash_balance": float(summary.get("cash_balance", 0.0))
         }
     except Exception as e:
         logger.error(f"Error calculating KPIs: {e}")

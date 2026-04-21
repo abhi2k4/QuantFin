@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { SignIn } from '@clerk/clerk-react';
+import { SignIn } from '@/lib/clerk';
 import { Button } from '@/components/ui/button';
 
 const fadeInUp = {

@@ -1,0 +1,91 @@
+{
+  "results": [
+    {
+      "variant": {
+        "name": "Monthly (2023-01-01 to 2024-01-01)",
+        "strategy": "LINEAR",
+        "start_date": "2023-01-01",
+        "end_date": "2024-01-01",
+        "capital": 100000,
+        "top_n": 10,
+        "rebalance_frequency": "monthly"
+      },
+      "strategy": {
+        "cagr": 48.3118504190301,
+        "sharpe": 3.0433368097962843,
+        "sortino": 14.24369093461377,
+        "max_drawdown": -1.165178799567855,
+        "volatility": 11.712659686648715,
+        "final_value": 148271.84440825673
+      },
+      "benchmark": {
+        "cagr": 30.60229278185829,
+        "sharpe": 1.7516444523000687,
+        "sortino": 5.037857476487776,
+        "max_drawdown": -4.180504450562003,
+        "volatility": 12.97611823326546,
+        "final_value": 130578.42839137219
+      },
+      "num_rebalances": 12,
+      "num_points": 13
+    },
+    {
+      "variant": {
+        "name": "Quarterly (2023-01-01 to 2024-01-01)",
+        "strategy": "LINEAR",
+        "start_date": "2023-01-01",
+        "end_date": "2024-01-01",
+        "capital": 100000,
+        "top_n": 10,
+        "rebalance_frequency": "quarterly"
+      },
+      "strategy": {
+        "cagr": 40.53591113443895,
+        "sharpe": 3.7245367296451004,
+        "sortino": 0.0,
+        "max_drawdown": 0.0,
+        "volatility": 27.970444303079965,
+        "final_value": 140503.1816348727
+      },
+      "benchmark": {
+        "cagr": 31.08563200220038,
+        "sharpe": 2.6922158658025555,
+        "sortino": NaN,
+        "max_drawdown": -4.365931141054185,
+        "volatility": 30.574912351994648,
+        "final_value": 131061.34791513247
+      },
+      "num_rebalances": 4,
+      "num_points": 5
+    },
+    {
+      "variant": {
+        "name": "Monthly (2022-01-01 to 2024-01-01)",
+        "strategy": "LINEAR",
+        "start_date": "2022-01-01",
+        "end_date": "2024-01-01",
+        "capital": 100000,
+        "top_n": 10,
+        "rebalance_frequency": "monthly"
+      },
+      "strategy": {
+        "cagr": 37.468588184576234,
+        "sharpe": 1.796248956186935,
+        "sortino": 4.159792507929047,
+        "max_drawdown": -5.3095948689119545,
+        "volatility": 15.799003839521278,
+        "final_value": 188893.82226895806
+      },
+      "benchmark": {
+        "cagr": 19.60031346307003,
+        "sharpe": 0.9013812788269482,
+        "sortino": 2.3844636109161037,
+        "max_drawdown": -9.791215340545484,
+        "volatility": 15.719458575677574,
+        "final_value": 143007.30622045242
+      },
+      "num_rebalances": 24,
+      "num_points": 25
+    }
+  ]
+}

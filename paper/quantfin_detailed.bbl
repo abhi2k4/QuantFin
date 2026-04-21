@@ -1,0 +1,44 @@
+\begin{thebibliography}{1}
+
+\bibitem{aithal2023realtime}
+Prakash~K. Aithal, M.~Geetha, Dinesh U, Basri Savitha, and Parthiv Menon.
+\newblock Real-time portfolio management system utilizing machine learning
+  techniques.
+\newblock {\em IEEE Access}, 11:32595--32608, 2023.
+
+\bibitem{gao2021arimadeep}
+Zihao Gao.
+\newblock Stock price prediction with arima and deep learning models.
+\newblock In {\em 2021 IEEE 6th International Conference on Big Data Analytics
+  (ICBDA)}, pages 61--68, 2021.
+
+\bibitem{gunjan2022portfolioreview}
+Abhishek Gunjan and Siddhartha Bhattacharyya.
+\newblock A brief review of portfolio optimization techniques.
+\newblock {\em Artificial Intelligence Review}, 56(5):3847--3886, 2022.
+
+\bibitem{karlis2021lstmfusion}
+Vasilis Karlis, Katerina Lepenioti, Alexandros Bousdekis, and Gregoris Mentzas.
+\newblock Stock trend prediction by fusing prices and indices with lstm neural
+  networks.
+\newblock In {\em 2021 12th International Conference on Information,
+  Intelligence, Systems \& Applications (IISA)}, pages 1--7, 2021.
+
+\bibitem{lim2022dynamicrebalancing}
+Qing Yang~Eddy Lim, Qi~Cao, and Chai Quek.
+\newblock Dynamic portfolio rebalancing through reinforcement learning.
+\newblock {\em Neural Computing and Applications}, 34(9):7125--7139, 2022.
+
+\bibitem{ma2023tcr}
+Cong Ma, Jiangshe Zhang, Zongxin Li, and Shuang Xu.
+\newblock Multi-agent deep reinforcement learning algorithm with trend
+  consistency regularization for portfolio management.
+\newblock {\em Neural Computing and Applications}, 35(9):6589--6601, 2023.
+
+\bibitem{saha2021stockranking}
+Suman Saha, Junbin Gao, and Richard Gerlach.
+\newblock Stock ranking prediction using list-wise approach and node embedding
+  technique.
+\newblock {\em IEEE Access}, 9:88981--88996, 2021.
+
+\end{thebibliography}

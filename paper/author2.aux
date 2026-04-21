@@ -1,0 +1,76 @@
+\relax 
+\citation{aithal2023realtime}
+\citation{saha2021stockranking}
+\citation{gao2021arimadeep}
+\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{}\protected@file@percent }
+\newlabel{sec:intro}{{I}{1}{}{section.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{1}{}\protected@file@percent }
+\newlabel{sec:rw}{{II}{1}{}{section.2}{}}
+\citation{karlis2021lstmfusion}
+\citation{gunjan2022portfolioreview}
+\citation{lim2022dynamicrebalancing}
+\citation{ma2023tcr}
+\citation{emekcioglu2023gnn}
+\@writefile{toc}{\contentsline {section}{\numberline {III}System Model / Problem Formulation}{2}{}\protected@file@percent }
+\newlabel{sec:form}{{III}{2}{}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Ranking-based selection}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Benchmark definition}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Assumptions and constraints}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Methodology / Proposed Method}{2}{}\protected@file@percent }
+\newlabel{sec:method}{{IV}{2}{}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Feature engineering details (repo-implemented indicators)}{2}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Representative engineered indicators used by QuantFin (implemented in repository services).}}{3}{}\protected@file@percent }
+\newlabel{tab:features}{{I}{3}{}{table.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces QuantFin system architecture.}}{3}{}\protected@file@percent }
+\newlabel{fig:arch}{{1}{3}{}{figure.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {V}Algorithm / Architecture Design}{3}{}\protected@file@percent }
+\newlabel{sec:arch}{{V}{3}{}{section.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}System architecture}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Leakage-aware rebalancing algorithm}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Implementation Details}{3}{}\protected@file@percent }
+\newlabel{sec:impl}{{VI}{3}{}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-A}}Dataset and storage}{3}{}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Leakage-aware monthly rebalancing (simplified)}}{3}{}\protected@file@percent }
+\newlabel{alg:rebalance}{{1}{3}{}{algorithm.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Repository dataset summary (computed from the backend data directory).}}{3}{}\protected@file@percent }
+\newlabel{tab:dataset}{{II}{3}{}{table.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}Software stack}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}API surface (backend)}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-D}}Model suite}{3}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Representative API endpoint groups in the QuantFin backend.}}{4}{}\protected@file@percent }
+\newlabel{tab:api}{{III}{4}{}{table.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Experimental Setup}{4}{}\protected@file@percent }
+\newlabel{sec:setup}{{VII}{4}{}{section.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-A}}Evaluation protocol}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-B}}Backtest configuration (repo-grounded)}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VII-C}}Metrics}{4}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Normalized equity curve for the implemented LINEAR strategy vs. the equal-weight benchmark (monthly rebalancing, 2023-01-01 to 2024-01-01).}}{4}{}\protected@file@percent }
+\newlabel{fig:equitycurve}{{2}{4}{}{figure.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Drawdown comparison for the implemented LINEAR strategy vs. the equal-weight benchmark over the same walk-forward run.}}{4}{}\protected@file@percent }
+\newlabel{fig:drawdown}{{3}{4}{}{figure.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VIII}Results and Discussion}{4}{}\protected@file@percent }
+\newlabel{sec:results}{{VIII}{4}{}{section.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-A}}Sample model metrics}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-B}}Walk-forward backtest example (strategy vs. benchmark)}{4}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Sample training metrics for a representative symbol (RELIANCE) from a recorded QuantFin run.}}{5}{}\protected@file@percent }
+\newlabel{tab:metrics}{{IV}{5}{}{table.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Walk-forward backtest summary (monthly rebalancing, 2023-01-01 to 2024-01-01).}}{5}{}\protected@file@percent }
+\newlabel{tab:backtest}{{V}{5}{}{table.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-C}}Additional backtest variants}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-D}}Discussion}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VIII-E}}Limitations and future work}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IX}Conclusion}{5}{}\protected@file@percent }
+\bibstyle{IEEEtran}
+\bibdata{review}
+\bibcite{aithal2023realtime}{1}
+\bibcite{saha2021stockranking}{2}
+\bibcite{gao2021arimadeep}{3}
+\bibcite{karlis2021lstmfusion}{4}
+\bibcite{gunjan2022portfolioreview}{5}
+\bibcite{lim2022dynamicrebalancing}{6}
+\bibcite{ma2023tcr}{7}
+\bibcite{emekcioglu2023gnn}{8}
+\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Backtest variants produced by the repository engine (LINEAR strategy vs. equal-weight benchmark).}}{6}{}\protected@file@percent }
+\newlabel{tab:variants}{{VI}{6}{}{table.6}{}}
+\@writefile{toc}{\contentsline {section}{References}{6}{}\protected@file@percent }
+\gdef \@abspage@last{6}

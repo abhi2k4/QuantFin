@@ -1,0 +1,97 @@
+\relax 
+\citation{aithal2023realtime,gunjan2022portfolioreview}
+\@writefile{toc}{\contentsline {title}{ML-Based Decision Support System for Smart Investments}{1}{}\protected@file@percent }
+\@writefile{toc}{\authcount {1}}
+\@writefile{toc}{\contentsline {author}{Reshma Koli, Avanish Vadke, Atharva Shelke, Abhishek Thormothe, Aadit Suryawanshi and Prof. Harshada Sonkamble}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{}\protected@file@percent }
+\newlabel{sec:intro}{{1}{1}{}{section.1}{}}
+\citation{aithal2023realtime}
+\citation{saha2021stockranking}
+\citation{gao2021arimadeep,karlis2021lstmfusion}
+\citation{gunjan2022portfolioreview}
+\citation{lim2022dynamicrebalancing,ma2023tcr}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{2}{}\protected@file@percent }
+\newlabel{sec:rw}{{2}{2}{}{section.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}System Overview}{3}{}\protected@file@percent }
+\newlabel{sec:system}{{3}{3}{}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Backend services and APIs}{3}{}\protected@file@percent }
+\newlabel{sec:api}{{3.1}{3}{}{subsection.3.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}API surface (selected endpoints)}{3}{}\protected@file@percent }
+\newlabel{sec:api_surface}{{3.2}{3}{}{subsection.3.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Selected API endpoints (from implemented routers).}}{3}{}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{tab:api_surface}{{1}{3}{}{table.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Artifacts and reproducibility}{3}{}\protected@file@percent }
+\newlabel{sec:artifacts}{{3.3}{3}{}{subsection.3.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Data and Preprocessing}{4}{}\protected@file@percent }
+\newlabel{sec:data}{{4}{4}{}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Multi-header CSV normalization}{4}{}\protected@file@percent }
+\newlabel{sec:multiheader}{{4.1}{4}{}{subsection.4.1}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Multi-header OHLCV normalization (repo-aligned)}}{4}{}\protected@file@percent }
+\newlabel{alg:normalize}{{1}{4}{}{algorithm.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Dataset summary}{4}{}\protected@file@percent }
+\newlabel{sec:dataset_summary}{{4.2}{4}{}{subsection.4.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Dataset scope (from repository dataset summary artifact).}}{4}{}\protected@file@percent }
+\newlabel{tab:dataset}{{2}{4}{}{table.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Feature Engineering}{4}{}\protected@file@percent }
+\newlabel{sec:features}{{5}{4}{}{section.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Model Suite}{5}{}\protected@file@percent }
+\newlabel{sec:models}{{6}{5}{}{section.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Ridge regression (price/return regression)}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Logistic regression (direction classification)}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Support vector machines (SVM)}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}ARIMA baseline (classical time-series)}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.5}LSTM (sequence forecasting)}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.6}Repo-grounded training example (RELIANCE)}{5}{}\protected@file@percent }
+\newlabel{sec:reliance}{{6.6}{5}{}{subsection.6.6}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Saved training metrics for RELIANCE (from repository artifacts).}}{6}{}\protected@file@percent }
+\newlabel{tab:reliance_metrics}{{3}{6}{}{table.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Stored linear regression results across symbols (split date 2023-01-01; from repository artifact).}}{6}{}\protected@file@percent }
+\newlabel{tab:linear_multi}{{4}{6}{}{table.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.7}Additional stored regression baselines across symbols}{6}{}\protected@file@percent }
+\newlabel{sec:more_training}{{6.7}{6}{}{subsection.6.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Decision Layer: Portfolio Construction}{6}{}\protected@file@percent }
+\newlabel{sec:portfolio}{{7}{6}{}{section.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Ranking-based selection and allocation}{6}{}\protected@file@percent }
+\newlabel{sec:ranking}{{7.1}{6}{}{subsection.7.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Optimization baselines}{6}{}\protected@file@percent }
+\newlabel{sec:opt}{{7.2}{6}{}{subsection.7.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Walk-Forward Backtesting}{7}{}\protected@file@percent }
+\newlabel{sec:backtest}{{8}{7}{}{section.8}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Leakage-aware walk-forward backtest (high-level)}}{7}{}\protected@file@percent }
+\newlabel{alg:backtest}{{2}{7}{}{algorithm.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Example reproducible run (2023-01 to 2024-01)}{7}{}\protected@file@percent }
+\newlabel{sec:run}{{8.1}{7}{}{subsection.8.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Backtest summary (monthly rebalancing, 2023-01-01 to 2024-01-01; stored artifact).}}{7}{}\protected@file@percent }
+\newlabel{tab:backtest_summary}{{5}{7}{}{table.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Backtest variants (stored summaries)}{7}{}\protected@file@percent }
+\newlabel{sec:variants}{{8.2}{7}{}{subsection.8.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Stored backtest variants for LINEAR strategy (from repository variants summary artifact).}}{8}{}\protected@file@percent }
+\newlabel{tab:variants}{{6}{8}{}{table.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Visualization}{8}{}\protected@file@percent }
+\newlabel{sec:viz}{{8.3}{8}{}{subsection.8.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Equity curve: LINEAR strategy vs benchmark (stored figure).}}{8}{}\protected@file@percent }
+\newlabel{fig:equity}{{1}{8}{}{figure.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {9}Frontend and User Interaction}{8}{}\protected@file@percent }
+\newlabel{sec:frontend}{{9}{8}{}{section.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Drawdown: LINEAR strategy vs benchmark (stored figure).}}{9}{}\protected@file@percent }
+\newlabel{fig:drawdown}{{2}{9}{}{figure.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {10}Engineering Validation Snapshot}{9}{}\protected@file@percent }
+\newlabel{sec:validation}{{10}{9}{}{section.10}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Validation report snapshot (from repository validation artifact).}}{9}{}\protected@file@percent }
+\newlabel{tab:validation}{{7}{9}{}{table.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {11}Limitations and Threats to Validity}{9}{}\protected@file@percent }
+\newlabel{sec:limits}{{11}{9}{}{section.11}{}}
+\bibstyle{plain}
+\bibdata{review}
+\@writefile{toc}{\contentsline {section}{\numberline {12}Conclusion and Future Work}{10}{}\protected@file@percent }
+\newlabel{sec:con}{{12}{10}{}{section.12}{}}
+\bibcite{aithal2023realtime}{{1}{}{{}}{{}}}
+\bibcite{gao2021arimadeep}{{2}{}{{}}{{}}}
+\bibcite{gunjan2022portfolioreview}{{3}{}{{}}{{}}}
+\bibcite{karlis2021lstmfusion}{{4}{}{{}}{{}}}
+\bibcite{lim2022dynamicrebalancing}{{5}{}{{}}{{}}}
+\bibcite{ma2023tcr}{{6}{}{{}}{{}}}
+\bibcite{saha2021stockranking}{{7}{}{{}}{{}}}
+\providecommand\NAT@force@numbers{}\NAT@force@numbers
+\gdef \@abspage@last{11}

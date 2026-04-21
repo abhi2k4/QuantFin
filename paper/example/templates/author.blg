@@ -1,0 +1,125 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: author.aux
+Reallocating 'name_of_file' (item size: 1) to 6 items.
+The style file: plain.bst
+Reallocating 'name_of_file' (item size: 1) to 7 items.
+Database file #1: review.bib
+Warning--entry type for "ls2018" isn't style-file defined
+--line 159 of file review.bib
+Repeated entry---line 1202 of file review.bib
+ : @article{sharma2012fitness
+ :                           ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 1676 of file review.bib
+ : @book{chakraborty2008advances
+ :                              ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 1784 of file review.bib
+ : @article{das2006two
+ :                    ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 1938 of file review.bib
+ : @book{engelbrecht2007computational
+ :                                   ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 2064 of file review.bib
+ : @book{holland1975adaptation
+ :                            ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 2157 of file review.bib
+ : @article{karaboga2005idea
+ :                          ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 2192 of file review.bib
+ : @inproceedings{kennedy1995particle
+ :                                   ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 2268 of file review.bib
+ : @inproceedings{lampinen2000stagnation
+ :                                      ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 2313 of file review.bib
+ : @article{liu2008inverse
+ :                        ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 2699 of file review.bib
+ : @inproceedings{price1996differential
+ :                                     ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 2767 of file review.bib
+ : @article{rogalsky2000differential
+ :                                  ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 2828 of file review.bib
+ : @inproceedings{sharma2012dynamic
+ :                                 ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 2838 of file review.bib
+ : @article{sharma2012fitness
+ :                           ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 2961 of file review.bib
+ : @article{storn1995differential
+ :                               ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 2986 of file review.bib
+ : @techreport{storn1995differential
+ :                                  ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 3007 of file review.bib
+ : @article{teo2006exploring
+ :                          ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 3020 of file review.bib
+ : @inproceedings{vesterstrom2004comparative
+ :                                          ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 3096 of file review.bib
+ : @article{williamson1989box
+ :                           ,
+I'm skipping whatever remains of this entry
+Warning--to sort, need author or key in ls2018
+Warning--there's a number but no series in holland1975adaptation
+You've used 29 entries,
+            2118 wiz_defined-function locations,
+            671 strings with 9308 characters,
+and the built_in function-call counts, 11214 in all, are:
+= -- 1168
+> -- 433
+< -- 17
++ -- 176
+- -- 142
+* -- 730
+:= -- 1722
+add.period$ -- 98
+call.type$ -- 29
+change.case$ -- 154
+chr.to.int$ -- 0
+cite$ -- 31
+duplicate$ -- 475
+empty$ -- 923
+format.name$ -- 142
+if$ -- 2477
+int.to.chr$ -- 0
+int.to.str$ -- 29
+missing$ -- 31
+newline$ -- 146
+num.names$ -- 56
+pop$ -- 189
+preamble$ -- 1
+purify$ -- 128
+quote$ -- 0
+skip$ -- 355
+stack$ -- 0
+substring$ -- 802
+swap$ -- 160
+text.length$ -- 17
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 110
+warning$ -- 2
+while$ -- 113
+width$ -- 31
+write$ -- 327
+(There were 18 error messages)

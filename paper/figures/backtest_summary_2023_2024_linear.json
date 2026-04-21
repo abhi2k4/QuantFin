@@ -1,0 +1,24 @@
+{
+  "config":{
+    "strategy":"LINEAR",
+    "start_date":"2023-01-01",
+    "end_date":"2024-01-01",
+    "capital":100000,
+    "top_n":10,
+    "rebalance_frequency":"monthly"
+  },
+  "strategy":{
+    "cagr":48.311850419,
+    "sharpe":3.0433368098,
+    "sortino":14.2436909346,
+    "max_drawdown":-1.1651787996,
+    "final_value":148271.8444082567
+  },
+  "benchmark":{
+    "cagr":30.6022927819,
+    "sharpe":1.7516444523,
+    "sortino":5.0378574765,
+    "max_drawdown":-4.1805044506,
+    "final_value":130578.4283913722
+  }
+}

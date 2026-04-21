@@ -39,10 +39,11 @@ router = APIRouter(prefix="/api/portfolio", tags=["portfolio"])
 _strategy_cache = {}
 _cache_timestamp = {}
 CACHE_DURATION = 300  # 5 minutes in seconds
+CACHE_KEY_VERSION = "v3"
 
 def get_cached_strategy_comparison(timeframe: str, capital: float):
     """Get cached strategy comparison if available and fresh"""
-    cache_key = f"{timeframe}_{capital}"
+    cache_key = f"{CACHE_KEY_VERSION}_{timeframe}_{capital}"
     
     if cache_key in _strategy_cache:
         cached_time = _cache_timestamp.get(cache_key)
@@ -54,7 +55,7 @@ def get_cached_strategy_comparison(timeframe: str, capital: float):
 
 def cache_strategy_comparison(timeframe: str, capital: float, data):
     """Cache strategy comparison results"""
-    cache_key = f"{timeframe}_{capital}"
+    cache_key = f"{CACHE_KEY_VERSION}_{timeframe}_{capital}"
     _strategy_cache[cache_key] = data
     _cache_timestamp[cache_key] = datetime.now()
     logger.info(f"Cached strategy comparison for {timeframe}")
@@ -313,81 +314,125 @@ async def get_strategy_comparison(
         
         logger.info(f"Generating strategy comparison for {timeframe} timeframe...")
         
-        # Get performance for each strategy
+        # Build a common date axis using RELIANCE as a benchmark proxy.
+        # This avoids index mismatches in the frontend chart (it uses LSTM.dates as the x-axis).
+        benchmark_symbol = 'RELIANCE'
+        try:
+            _, benchmark_max_date = data_service.get_date_range(benchmark_symbol)
+        except Exception:
+            benchmark_max_date = datetime.now()
+
+        end_date = benchmark_max_date
+        start_date = end_date - timedelta(days=days)
+
+        benchmark_df = data_service.get_ohlcv_data(
+            benchmark_symbol,
+            start_date=start_date,
+            end_date=end_date
+        )
+        if benchmark_df is None or benchmark_df.empty:
+            raise HTTPException(status_code=500, detail="No benchmark data available")
+
+        benchmark_df = benchmark_df.sort_values('Date')
+        base_dates = pd.to_datetime(benchmark_df['Date']).dt.normalize()
+        base_date_strs = base_dates.dt.strftime('%Y-%m-%d').tolist()
+
+        # Nifty50 proxy (normalized benchmark)
+        first_close = float(benchmark_df['Close'].iloc[0])
+        bench_values = [(float(close) / first_close) * capital for close in benchmark_df['Close']]
+        bench_final_value = float(bench_values[-1])
+        bench_return = ((bench_final_value - capital) / capital) * 100
+        results['NIFTY50'] = {
+            'dates': base_date_strs,
+            'values': [round(v, 2) for v in bench_values],
+            'total_return': round(bench_return, 2),
+            'final_value': round(bench_final_value, 2)
+        }
+
+        def _aligned_close_series(symbol: str) -> Optional[pd.Series]:
+            """Fetch close prices and align them to the benchmark date axis."""
+            df = data_service.get_ohlcv_data(symbol, start_date=start_date, end_date=end_date)
+            if df is None or df.empty:
+                return None
+            df = df.sort_values('Date')
+            df['Date'] = pd.to_datetime(df['Date']).dt.normalize()
+            s = df.set_index('Date')['Close'].astype(float)
+            # Reindex onto base dates and carry forward last available close.
+            s = s.reindex(base_dates, method='ffill')
+            s = s.bfill()
+            if s.isna().any():
+                return None
+            return s
+
+        # Get performance for each strategy using real historical prices of the recommended basket
         for strategy in strategies:
             try:
                 logger.info(f"Processing {strategy} strategy...")
-                
-                # Generate allocations for this strategy
+
                 allocation_result = await allocator.generate_allocations(
                     strategy=strategy,
                     capital=capital,
                     top_n=10,
                     forecast_days=30
                 )
-                
-                # Calculate portfolio performance
-                allocations = allocation_result['allocations']
-                metrics = allocation_result['metrics']
-                
-                # Simulate portfolio growth based on predictions
-                portfolio_values = []
-                dates = []
-                current_value = capital
-                
-                # Get date range
-                end_date = datetime.now()
-                start_date = end_date - timedelta(days=days)
-                date_range = pd.date_range(start=start_date, end=end_date, freq='D')
-                
-                for date in date_range:
-                    # Simulate daily growth based on expected return
-                    daily_return = metrics['expected_return'] / 365  # Annualized to daily
-                    current_value *= (1 + daily_return / 100)
-                    portfolio_values.append(round(current_value, 2))
-                    dates.append(date.strftime('%Y-%m-%d'))
-                
+
+                allocations = allocation_result.get('allocations') or []
+                metrics = allocation_result.get('metrics') or {}
+
+                if not allocations:
+                    results[strategy] = None
+                    continue
+
+                per_symbol_values = []
+                used_allocations = []
+                used_allocation_amount = 0.0
+
+                for a in allocations:
+                    symbol = a.get('symbol')
+                    allocation_amount = float(a.get('allocation_amount') or 0)
+                    if not symbol or allocation_amount <= 0:
+                        continue
+
+                    close_series = _aligned_close_series(symbol)
+                    if close_series is None or close_series.empty:
+                        continue
+
+                    first_price = float(close_series.iloc[0])
+                    if first_price <= 0:
+                        continue
+
+                    normalized = close_series / first_price
+                    per_symbol_values.append(normalized * allocation_amount)
+                    used_allocations.append(symbol)
+                    used_allocation_amount += allocation_amount
+
+                if not per_symbol_values:
+                    results[strategy] = None
+                    continue
+
+                cash_remaining = max(0.0, float(capital) - used_allocation_amount)
+
+                portfolio_series = cash_remaining
+                for s in per_symbol_values:
+                    portfolio_series = portfolio_series + s
+
+                values = [round(float(v), 2) for v in portfolio_series.tolist()]
+                final_value = float(values[-1])
+                total_return = ((final_value - capital) / capital) * 100
+
                 results[strategy] = {
-                    'dates': dates,
-                    'values': portfolio_values,
-                    'total_return': ((current_value - capital) / capital) * 100,
-                    'expected_return': metrics['expected_return'],
-                    'expected_risk': metrics['expected_risk'],
-                    'sharpe_ratio': metrics.get('sharpe_ratio', 0),
-                    'final_value': round(current_value, 2),
-                    'top_stocks': [a['symbol'] for a in allocations[:5]]
+                    'dates': base_date_strs,
+                    'values': values,
+                    'total_return': round(float(total_return), 2),
+                    'expected_return': float(metrics.get('expected_return', 0)),
+                    'expected_risk': float(metrics.get('expected_risk', 0)),
+                    'sharpe_ratio': float(metrics.get('sharpe_ratio', 0) or 0),
+                    'final_value': round(final_value, 2),
+                    'top_stocks': used_allocations[:5]
                 }
             except Exception as e:
-                logger.error(f"Error calculating {strategy} performance: {e}")
+                logger.error(f"Error calculating {strategy} performance: {e}", exc_info=True)
                 results[strategy] = None
-        
-        # Get Nifty50 benchmark performance
-        try:
-            logger.info("Processing Nifty50 benchmark...")
-            # Use RELIANCE as proxy for Nifty50 (or calculate weighted average of all stocks)
-            nifty_data = data_service.get_historical_data('RELIANCE', last_n_days=days)
-            if not nifty_data.empty:
-                nifty_data = nifty_data.sort_values('Date')
-                dates = nifty_data['Date'].dt.strftime('%Y-%m-%d').tolist()
-                
-                # Normalize to capital amount
-                first_close = nifty_data['Close'].iloc[0]
-                values = [(close / first_close) * capital for close in nifty_data['Close']]
-                
-                final_value = values[-1]
-                nifty_return = ((final_value - capital) / capital) * 100
-                
-                results['NIFTY50'] = {
-                    'dates': dates,
-                    'values': [round(v, 2) for v in values],
-                    'total_return': round(nifty_return, 2),
-                    'final_value': round(final_value, 2)
-                }
-            else:
-                results['NIFTY50'] = None
-        except Exception as e:
-            logger.error(f"Error calculating Nifty50 performance: {e}")
-            results['NIFTY50'] = None
         
         response_data = {
             'timeframe': timeframe,

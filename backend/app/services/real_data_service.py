@@ -128,6 +128,85 @@ class RealDataService:
                 continue
         
         return prices
+
+    def get_latest_close_snapshot(self, symbols: Optional[List[str]] = None) -> Dict[str, Dict[str, Optional[float]]]:
+        """Get the latest and previous close for each symbol in one pass.
+
+        Returns a dictionary keyed by symbol with:
+        - latest_close
+        - previous_close
+        - latest_date
+        - previous_date
+        """
+        if symbols is None:
+            symbols = self.symbols
+
+        snapshot: Dict[str, Dict[str, Optional[float]]] = {}
+        for symbol in symbols:
+            try:
+                df = self.load_stock_data(symbol)
+                if df is None or len(df) < 2:
+                    continue
+
+                last_row = df.iloc[-1]
+                prev_row = df.iloc[-2]
+
+                snapshot[symbol] = {
+                    "latest_close": float(last_row["Close"]),
+                    "previous_close": float(prev_row["Close"]),
+                    "latest_date": pd.to_datetime(last_row["Date"]).to_pydatetime(),
+                    "previous_date": pd.to_datetime(prev_row["Date"]).to_pydatetime(),
+                }
+            except Exception as e:
+                self.logger.warning(f"Could not build close snapshot for {symbol}: {e}")
+                continue
+
+        return snapshot
+
+    def get_last_two_closes(
+        self,
+        symbol: str,
+        as_of_date: Optional[datetime] = None,
+    ) -> Optional[Tuple[datetime, float, datetime, float]]:
+        """Get the most recent close and the previous trading close.
+
+        This is intended for day-over-day change calculations where using
+        "closest date" can incorrectly return the same close on weekends/holidays.
+
+        Args:
+            symbol: Stock symbol
+            as_of_date: Optional cutoff; uses the last available close on or before this date
+
+        Returns:
+            (last_date, last_close, prev_date, prev_close) or None if insufficient data
+        """
+        try:
+            df = self.load_stock_data(symbol)
+            if df is None or df.empty:
+                return None
+
+            if as_of_date is not None:
+                cutoff = pd.to_datetime(as_of_date)
+                df = df[df["Date"] <= cutoff]
+
+            if len(df) < 2:
+                return None
+
+            last_row = df.iloc[-1]
+            prev_row = df.iloc[-2]
+
+            last_date = pd.to_datetime(last_row["Date"]).to_pydatetime()
+            prev_date = pd.to_datetime(prev_row["Date"]).to_pydatetime()
+
+            return (
+                last_date,
+                float(last_row["Close"]),
+                prev_date,
+                float(prev_row["Close"]),
+            )
+        except Exception as e:
+            self.logger.error(f"Error getting last two closes for {symbol}: {e}")
+            return None
     
     def get_available_symbols(self) -> List[str]:
         """Get list of all available stock symbols."""

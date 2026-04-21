@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -84,20 +84,12 @@ export default function Dashboard() {
   const [showCashBalanceDialog, setShowCashBalanceDialog] = useState(false);
   const [newCashBalance, setNewCashBalance] = useState<string>('');
   const [updatingCashBalance, setUpdatingCashBalance] = useState(false);
+  const summaryLoadedRef = useRef(false);
 
-  // Load data on mount and when filters change
-  useEffect(() => {
-    loadPortfolioSummary();
-  }, []);
-
-  useEffect(() => {
-    loadPortfolioPerformance();
-  }, [timeframe]);
-
-  const loadPortfolioSummary = async () => {
+  const loadPortfolioSummary = async (signal?: AbortSignal) => {
     setLoadingSummary(true);
     try {
-      const data = await getPortfolioSummary();
+      const data = await getPortfolioSummary(signal);
       // Calculate allocations
       const totalValue = data.positions.reduce((sum, pos) => sum + (pos.quantity * pos.current_price), 0);
       data.positions = data.positions.map(pos => ({
@@ -106,6 +98,9 @@ export default function Dashboard() {
       }));
       setSummary(data);
     } catch (error) {
+      if (signal?.aborted || (error as { code?: string; name?: string })?.code === 'ERR_CANCELED' || (error as { code?: string; name?: string })?.name === 'CanceledError') {
+        return;
+      }
       console.error('Error loading portfolio summary:', error);
       toast.error(getErrorMessage(error));
     } finally {
@@ -113,12 +108,15 @@ export default function Dashboard() {
     }
   };
 
-  const loadPortfolioPerformance = async () => {
+  const loadPortfolioPerformance = async (currentTimeframe: Timeframe, signal?: AbortSignal) => {
     setLoadingPerformance(true);
     try {
-      const data = await getPortfolioPerformance(timeframe);
+      const data = await getPortfolioPerformance(currentTimeframe, signal);
       setPerformance(data);
     } catch (error) {
+      if (signal?.aborted || (error as { code?: string; name?: string })?.code === 'ERR_CANCELED' || (error as { code?: string; name?: string })?.name === 'CanceledError') {
+        return;
+      }
       console.error('Error loading portfolio performance:', error);
       toast.error(getErrorMessage(error));
     } finally {
@@ -126,19 +124,37 @@ export default function Dashboard() {
     }
   };
 
-  const loadStrategyComparison = async () => {
+  const loadStrategyComparison = async (currentTimeframe: Timeframe, signal?: AbortSignal) => {
     try {
-      const data = await getStrategyComparison(timeframe, 100000);
+      const data = await getStrategyComparison(currentTimeframe, 100000, signal);
       setStrategyComparison(data);
     } catch (error) {
+      if (signal?.aborted || (error as { code?: string; name?: string })?.code === 'ERR_CANCELED' || (error as { code?: string; name?: string })?.name === 'CanceledError') {
+        return;
+      }
       console.error('Error loading strategy comparison:', error);
       toast.error(getErrorMessage(error));
     }
   };
 
-  // Load strategy comparison when timeframe changes
   useEffect(() => {
-    loadStrategyComparison();
+    const controller = new AbortController();
+
+    const loadDashboardData = async () => {
+      if (!summaryLoadedRef.current) {
+        await loadPortfolioSummary(controller.signal);
+        summaryLoadedRef.current = true;
+      }
+
+      await loadPortfolioPerformance(timeframe, controller.signal);
+      await loadStrategyComparison(timeframe, controller.signal);
+    };
+
+    void loadDashboardData();
+
+    return () => {
+      controller.abort();
+    };
   }, [timeframe]);
   
   const handleUpdateCashBalance = async () => {
@@ -203,7 +219,7 @@ export default function Dashboard() {
       
       // Reload both summary and performance data
       await loadPortfolioSummary();
-      await loadPortfolioPerformance();
+      await loadPortfolioPerformance(timeframe);
     } catch (error) {
       console.error('Error rebalancing portfolio:', error);
       toast.error(getErrorMessage(error));
@@ -258,8 +274,9 @@ export default function Dashboard() {
               </Button>
               <Button
                 onClick={() => {
-                  loadPortfolioSummary();
-                  loadPortfolioPerformance();
+                  void loadPortfolioSummary();
+                  void loadPortfolioPerformance(timeframe);
+                  void loadStrategyComparison(timeframe);
                 }}
                 className="rounded-xl bg-white/5 hover:bg-white/10 border border-white/10"
               >
@@ -1346,9 +1363,13 @@ function StrategyComparisonChart({ data, timeframe, onTimeframeChange }: Strateg
   // Prepare chart data
   const chartData = useMemo(() => {
     const strategies = data.strategies;
-    if (!strategies.LSTM?.dates) return [];
+    const base =
+      strategies.LSTM ||
+      strategies.NIFTY50 ||
+      Object.values(strategies).find((s) => s?.dates && s.values);
+    if (!base?.dates) return [];
 
-    const dates = strategies.LSTM.dates;
+    const dates = base.dates;
     return dates.map((date, index) => {
       const point: any = { date };
       

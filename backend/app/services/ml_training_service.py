@@ -76,6 +76,7 @@ except ImportError:
     logging.info("ℹ statsmodels/pmdarima not available - ARIMA will use moving average fallback (REAL DATA, not mock)")
 
 from .real_data_service import RealDataService
+from .training_state import load_training_state, save_training_state
 
 logger = logging.getLogger(__name__)
 
@@ -112,6 +113,7 @@ class MLTrainingService:
             "started_at": None,
             "completed_at": None
         }
+        save_training_state(self.training_status)
         
         logger.info(f"MLTrainingService initialized. Cache dir: {self.cache_dir}")
     
@@ -758,6 +760,7 @@ class MLTrainingService:
             "started_at": datetime.now().isoformat(),
             "completed_at": None
         }
+        save_training_state(self.training_status)
         
         results = []
         model_trainers = [
@@ -788,6 +791,7 @@ class MLTrainingService:
                         results.append(cached_data)
                         self.training_status["models_completed"].append(model_name)
                         self.training_status["progress"] = int(((idx + 1) / total_models) * 100)
+                        save_training_state(self.training_status)
                         
                         print(f"✅ {model_name} loaded from cache successfully", flush=True)
                         print(f"📈 Progress: {self.training_status['progress']}%\n", flush=True)
@@ -799,6 +803,7 @@ class MLTrainingService:
                 # Train model
                 self.training_status["current_model"] = model_name
                 self.training_status["progress"] = int((idx / total_models) * 100)
+                save_training_state(self.training_status)
                 
                 print("=" * 80, flush=True)
                 print(f"🔧 [{idx+1}/{total_models}] Training {model_name}", flush=True)
@@ -825,6 +830,7 @@ class MLTrainingService:
                 
                 # Update progress
                 self.training_status["progress"] = int(((idx + 1) / total_models) * 100)
+                save_training_state(self.training_status)
                 
                 print(f"✅ {model_name} trained successfully!", flush=True)
                 print(f"📊 Accuracy: {metrics.get('accuracy', 'N/A')}%", flush=True)
@@ -856,6 +862,7 @@ class MLTrainingService:
         self.training_status["progress"] = 100
         self.training_status["completed_at"] = datetime.now().isoformat()
         self.training_status["current_model"] = None
+        save_training_state(self.training_status)
         
         # Summary
         print("\n" + "=" * 80, flush=True)
@@ -882,6 +889,9 @@ class MLTrainingService:
     
     def get_training_status(self) -> Dict[str, Any]:
         """Get current training status."""
+        state = load_training_state()
+        if state:
+            self.training_status.update(state)
         return self.training_status.copy()
 
 

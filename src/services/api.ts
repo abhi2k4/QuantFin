@@ -290,9 +290,12 @@ export interface OldBacktestRequest {
  * Get portfolio summary with current positions and total value
  * GET /api/portfolio/summary
  */
-export const getPortfolioSummary = async (): Promise<PortfolioSummary> => {
+export const getPortfolioSummary = async (signal?: AbortSignal): Promise<PortfolioSummary> => {
   try {
-    const response = await apiClient.get<PortfolioSummary>('/portfolio/summary');
+    const response = await apiClient.get<PortfolioSummary>('/portfolio/summary', {
+      signal,
+      timeout: 120000,
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching portfolio summary:', error);
@@ -305,11 +308,14 @@ export const getPortfolioSummary = async (): Promise<PortfolioSummary> => {
  * GET /api/portfolio/performance?timeframe=1M
  */
 export const getPortfolioPerformance = async (
-  timeframe: '1M' | '3M' | '6M' | '1Y' = '3M'
+  timeframe: '1M' | '3M' | '6M' | '1Y' = '3M',
+  signal?: AbortSignal
 ): Promise<PortfolioPerformance> => {
   try {
     const response = await apiClient.get<PortfolioPerformance>('/portfolio/performance', {
-      params: { timeframe }
+      params: { timeframe },
+      signal,
+      timeout: 120000,
     });
     return response.data;
   } catch (error) {
@@ -323,10 +329,14 @@ export const getPortfolioPerformance = async (
  * POST /api/portfolio/rebalance
  */
 export const rebalancePortfolio = async (
-  request: RebalanceRequest
+  request: RebalanceRequest,
+  signal?: AbortSignal
 ): Promise<RebalanceResponse> => {
   try {
-    const response = await apiClient.post<RebalanceResponse>('/portfolio/rebalance', request);
+    const response = await apiClient.post<RebalanceResponse>('/portfolio/rebalance', request, {
+      signal,
+      timeout: 120000,
+    });
     return response.data;
   } catch (error) {
     console.error('Error rebalancing portfolio:', error);
@@ -340,11 +350,14 @@ export const rebalancePortfolio = async (
  */
 export const getStrategyComparison = async (
   timeframe: '1M' | '3M' | '6M' | '1Y' = '3M',
-  capital: number = 100000
+  capital: number = 100000,
+  signal?: AbortSignal
 ): Promise<StrategyComparisonResponse> => {
   try {
     const response = await apiClient.get<StrategyComparisonResponse>('/portfolio/strategy-comparison', {
-      params: { timeframe, capital }
+      params: { timeframe, capital },
+      signal,
+      timeout: 120000,
     });
     return response.data;
   } catch (error) {

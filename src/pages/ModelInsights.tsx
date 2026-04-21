@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Brain, Activity, TrendingUp, Loader2, RefreshCw, Zap, CheckCircle, XCircle } from 'lucide-react';
-import { getModelPerformance, getErrorMessage, type ModelPerformance } from '@/services/api';
+import { getModelPerformance, getTrainingStatus, trainModels, getErrorMessage, type ModelPerformance } from '@/services/api';
 import { toast } from 'sonner';
 
 export default function ModelInsights() {
@@ -15,14 +15,11 @@ export default function ModelInsights() {
     loadModels();
   }, []);
 
-  const loadModels = async (forceTrain = false) => {
+  const loadModels = async () => {
     setLoading(true);
     try {
-      const data = await getModelPerformance(forceTrain);
+      const data = await getModelPerformance(false);
       setModels(data);
-      if (forceTrain) {
-        toast.success('Models trained successfully!');
-      }
     } catch (error) {
       console.error('Error loading models:', error);
       toast.error(getErrorMessage(error));
@@ -31,10 +28,43 @@ export default function ModelInsights() {
     }
   };
 
-  const handleTrainModels = () => {
+  const handleTrainModels = async () => {
     setTraining(true);
-    toast.info('Training models... This may take 30+ seconds');
-    loadModels(true).finally(() => setTraining(false));
+    const toastId = toast.loading('Training models...');
+
+    try {
+      await trainModels(true);
+
+      const startedAt = Date.now();
+      const timeoutMs = 10 * 60 * 1000; // 10 minutes
+
+      while (true) {
+        const status = await getTrainingStatus();
+
+        if (status.status === 'completed') {
+          break;
+        }
+        if (status.status === 'failed') {
+          throw new Error(status.error || 'Model training failed');
+        }
+
+        if (Date.now() - startedAt > timeoutMs) {
+          throw new Error('Model training timed out');
+        }
+
+        // Polling interval
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+
+      await loadModels();
+      toast.success('Models trained successfully!', { id: toastId });
+    } catch (error) {
+      console.error('Error training models:', error);
+      const message = error instanceof Error ? error.message : getErrorMessage(error);
+      toast.error(message, { id: toastId });
+    } finally {
+      setTraining(false);
+    }
   };
 
   const getModelIcon = (model: string) => {

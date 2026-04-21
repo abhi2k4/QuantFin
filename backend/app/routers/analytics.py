@@ -8,14 +8,16 @@ Author: QuantFin Team
 Date: 2025-10-30
 """
 
-from fastapi import APIRouter, HTTPException, Query, BackgroundTasks
+from fastapi import APIRouter, HTTPException, Query
 from typing import List, Dict, Any
 from pathlib import Path
 import logging
 import asyncio
+import multiprocessing
 
 from app.services.ml_training_service import get_training_service
 from app.services.real_data_service import RealDataService
+from app.services.training_state import save_training_state
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -28,7 +30,7 @@ training_service = get_training_service()
 
 
 def run_training_sync(force: bool):
-    """Synchronous wrapper to run async training in background."""
+    """Synchronous wrapper to run async training in a worker process."""
     import sys
     
     try:
@@ -86,7 +88,6 @@ def run_training_sync(force: bool):
 
 @router.post("/models/train")
 async def train_models(
-    background_tasks: BackgroundTasks,
     force: bool = Query(False, description="Force retrain even if cache exists")
 ):
     """
@@ -111,8 +112,20 @@ async def train_models(
                 "status": status
             }
         
-        # Start training in background using sync wrapper
-        background_tasks.add_task(run_training_sync, force)
+        # Mark training state immediately so polling starts returning progress.
+        save_training_state({
+            "status": "training",
+            "progress": 0,
+            "current_model": None,
+            "models_completed": [],
+            "error": None,
+            "started_at": None,
+            "completed_at": None,
+        })
+
+        # Start training in a separate process so the API worker stays responsive.
+        process = multiprocessing.Process(target=run_training_sync, args=(force,), daemon=True)
+        process.start()
         
         logger.info(f"Queued background training task (force={force})")
         

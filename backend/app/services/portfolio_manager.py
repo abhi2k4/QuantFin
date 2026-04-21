@@ -77,12 +77,24 @@ class PortfolioManager:
         total_invested = 0.0
         current_value = 0.0
         
-        # Get latest prices
+        # Get latest and previous closes in one pass.
         symbols = [pos['symbol'] for pos in db_positions]
-        latest_prices = self.data_service.get_latest_prices(symbols)
+        close_snapshot = self.data_service.get_latest_close_snapshot(symbols)
         
-        # Calculate yesterday's value for daily change
-        yesterday = datetime.now() - timedelta(days=1)
+        # Calculate daily change using the last two available trading closes.
+        portfolio_as_of = None
+        latest_dates = []
+        for symbol in symbols:
+            try:
+                df = self.data_service.load_stock_data(symbol)
+                if not df.empty:
+                    latest_dates.append(pd.to_datetime(df.iloc[-1]['Date']))
+            except Exception:
+                continue
+
+        if latest_dates:
+            portfolio_as_of = min(latest_dates)
+
         yesterday_value = 0.0
         
         for position in db_positions:
@@ -90,25 +102,26 @@ class PortfolioManager:
             quantity = position['quantity']
             avg_buy_price = position['avg_buy_price']
             
-            if symbol not in latest_prices:
+            snapshot = close_snapshot.get(symbol)
+            if not snapshot:
                 self.logger.warning(f"No price data for {symbol}")
                 continue
             
-            current_price = latest_prices[symbol]
+            current_price = snapshot['latest_close'] or 0.0
             position_value = quantity * current_price
             invested = quantity * avg_buy_price
             
             gain_loss = position_value - invested
             gain_loss_percent = (gain_loss / invested) * 100 if invested > 0 else 0
             
-            # Get yesterday's price for daily change
-            yesterday_price = self.data_service.get_price_on_date(symbol, yesterday)
-            if yesterday_price:
-                yesterday_position_value = quantity * yesterday_price
+            # Get the previous trading close for daily change.
+            previous_close = snapshot['previous_close'] or 0.0
+            if previous_close > 0:
+                yesterday_position_value = quantity * previous_close
                 yesterday_value += yesterday_position_value
-                
-                daily_change = current_price - yesterday_price
-                daily_change_percent = (daily_change / yesterday_price) * 100
+
+                daily_change = current_price - previous_close
+                daily_change_percent = (daily_change / previous_close) * 100 if previous_close else 0
             else:
                 daily_change = 0
                 daily_change_percent = 0
@@ -179,14 +192,6 @@ class PortfolioManager:
         days_map = {"1M": 30, "3M": 90, "6M": 180, "1Y": 365}
         days = days_map.get(timeframe, 90)
         
-        # Set end date
-        if as_of_date:
-            end_date = as_of_date
-        else:
-            end_date = datetime.now()
-        
-        start_date = end_date - timedelta(days=days)
-        
         # Get positions and cash balance from database
         db_positions = self.db.get_positions()
         metadata = self.db.get_metadata()
@@ -222,6 +227,29 @@ class PortfolioManager:
                 'quantity': pos['quantity'],
                 'avg_buy_price': pos['avg_buy_price']
             }
+
+        # ------------------------------------------------------------------
+        # Pick an end_date that actually exists in the CSV dataset.
+        # If we default to datetime.now() and the dataset ends earlier,
+        # the timeframe filter yields empty data and the endpoint returns 400.
+        #
+        # Use the latest common available date across portfolio symbols.
+        # ------------------------------------------------------------------
+        if as_of_date:
+            end_date = as_of_date
+        else:
+            latest_dates = []
+            for symbol in positions.keys():
+                try:
+                    _, symbol_end = self.data_service.get_date_range(symbol)
+                    if symbol_end is not None and not pd.isna(symbol_end):
+                        latest_dates.append(pd.to_datetime(symbol_end).to_pydatetime())
+                except Exception as e:
+                    self.logger.warning(f"Could not determine latest date for {symbol}: {e}")
+
+            end_date = min(latest_dates) if latest_dates else datetime.now()
+
+        start_date = end_date - timedelta(days=days)
         
         try:
             # Load price data for all symbols

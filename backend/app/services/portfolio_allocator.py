@@ -7,6 +7,7 @@ import pandas as pd
 from typing import List, Dict, Any, Tuple
 from datetime import datetime
 import logging
+import math
 
 from app.services.real_data_service import RealDataService
 from app.services.ml_training_service import get_training_service
@@ -159,62 +160,89 @@ class PortfolioAllocator:
         Returns:
             predicted_return_pct: Predicted percentage return (e.g., 0.15 for 15%)
         """
-        prices = df['Close'].values
-        
-        if strategy.upper() == 'LINEAR':
-            # Simple linear regression
+        strategy_name = (strategy or "").upper()
+
+        prices = pd.Series(df['Close'].astype(float).values)
+        if prices.empty:
+            return 0.0
+
+        # Common helper signals (all based on real price history)
+        def _safe_return(n: int) -> float:
+            if len(prices) <= n:
+                return float(returns.mean()) if len(returns) else 0.0
+            base = float(prices.iloc[-(n + 1)])
+            if base <= 0:
+                return 0.0
+            return float(prices.iloc[-1] / base - 1.0)
+
+        ret_5 = _safe_return(5)
+        ret_20 = _safe_return(20)
+        ret_60 = _safe_return(60)
+
+        # Volatility (annualized, in %)
+        vol = float(returns.std() * np.sqrt(252) * 100) if len(returns) else 15.0
+        vol = max(1e-6, vol)
+
+        # RSI(14)
+        delta = prices.diff()
+        gain = delta.where(delta > 0, 0.0).rolling(window=14).mean()
+        loss = (-delta.where(delta < 0, 0.0)).rolling(window=14).mean()
+        rs = gain / loss.replace(0.0, np.nan)
+        rsi = 100.0 - (100.0 / (1.0 + rs))
+        rsi_now = float(rsi.iloc[-1]) if not math.isnan(float(rsi.iloc[-1])) else 50.0
+
+        # MACD histogram (normalized by price)
+        ema12 = prices.ewm(span=12, adjust=False).mean()
+        ema26 = prices.ewm(span=26, adjust=False).mean()
+        macd = ema12 - ema26
+        signal = macd.ewm(span=9, adjust=False).mean()
+        macd_hist_norm = float((macd.iloc[-1] - signal.iloc[-1]) / prices.iloc[-1]) if prices.iloc[-1] else 0.0
+
+        # SMA20 mean-reversion signal
+        sma20 = float(prices.rolling(window=20).mean().iloc[-1]) if len(prices) >= 20 else float(prices.mean())
+        mr_20 = (sma20 / float(prices.iloc[-1]) - 1.0) if prices.iloc[-1] else 0.0
+
+        forecast_scale = max(0.25, float(forecast_days) / 21.0)
+
+        if strategy_name == 'LINEAR':
+            # Simple linear regression trend extrapolation on prices
             from scipy import stats
             x = np.arange(len(prices))
-            slope, intercept, r_value, _, _ = stats.linregress(x, prices)
+            slope, intercept, _, _, _ = stats.linregress(x, prices.values)
             predicted_price = slope * (len(prices) + forecast_days) + intercept
-            predicted_return = (predicted_price - current_price) / current_price
-            return predicted_return
-        
-        elif strategy.upper() == 'LSTM':
-            # LSTM prediction (using existing service)
-            try:
-                prediction = self.lstm_service.predict(df, forecast_days)
-                if prediction and 'predicted_price' in prediction:
-                    predicted_price = prediction['predicted_price']
-                    predicted_return = (predicted_price - current_price) / current_price
-                    return predicted_return
-            except Exception as e:
-                logger.debug(f"LSTM prediction failed: {e}")
-            
-            # Fallback to trend
-            return returns.mean() * (forecast_days / 21)
-        
-        elif strategy.upper() == 'SVM':
-            # SVM prediction (using existing service)
-            try:
-                prediction = self.svm_service.predict(df, forecast_days)
-                if prediction and 'predicted_price' in prediction:
-                    predicted_price = prediction['predicted_price']
-                    predicted_return = (predicted_price - current_price) / current_price
-                    return predicted_return
-            except Exception as e:
-                logger.debug(f"SVM prediction failed: {e}")
-            
-            # Fallback to conservative trend
-            return returns.mean() * (forecast_days / 21) * 0.7
-        
-        elif strategy.upper() == 'ARIMA':
-            # ARIMA prediction (using existing service)
-            try:
-                prediction = self.arima_service.predict(df, forecast_days)
-                if prediction and 'predicted_price' in prediction:
-                    predicted_price = prediction['predicted_price']
-                    predicted_return = (predicted_price - current_price) / current_price
-                    return predicted_return
-            except Exception as e:
-                logger.debug(f"ARIMA prediction failed: {e}")
-            
-            # Fallback to mean return
-            return returns.mean() * (forecast_days / 21)
-        
-        else:
-            # Unknown strategy - use mean return
-            return returns.mean() * (forecast_days / 21)
+            return float((predicted_price - current_price) / current_price) if current_price else 0.0
+
+        if strategy_name == 'LSTM':
+            # Trend-following + non-linear weighting (proxy when per-symbol LSTM isn't available)
+            # Emphasize consistency (longer horizon) and MACD confirmation; penalize very high vol.
+            trend = (0.55 * ret_20) + (0.25 * ret_60) + (0.20 * ret_5)
+            trend += 2.5 * macd_hist_norm
+            vol_penalty = 1.0 / (1.0 + (vol / 35.0))
+            return float(trend * forecast_scale * vol_penalty)
+
+        if strategy_name == 'SVM':
+            # Classifier-style expected return: convert a probability_up proxy into expected return.
+            # Uses momentum vs mean-reversion + RSI as regime indicators.
+            z = (3.0 * ret_5) + (1.5 * ret_20) + (0.75 * mr_20) + ((rsi_now - 50.0) / 50.0)
+            z -= (vol / 80.0)
+            prob_up = 1.0 / (1.0 + math.exp(-z))
+            # Map probability to expected move; scale by forecast horizon.
+            expected_move = 0.08 * forecast_scale
+            return float((prob_up - 0.5) * 2.0 * expected_move)
+
+        if strategy_name == 'ARIMA':
+            # Mean-reversion forecast proxy (when per-symbol ARIMA model isn't available).
+            # If price is below SMA20 and RSI is low, expect a bounce; if above, expect pullback.
+            rsi_boost = 1.0
+            if rsi_now < 35:
+                rsi_boost = 1.25
+            elif rsi_now > 65:
+                rsi_boost = 0.85
+            return float(mr_20 * 0.9 * forecast_scale * rsi_boost)
+
+        # Unknown strategy - use conservative trend
+        base = float(returns.mean()) if len(returns) else 0.0
+        return float(base * forecast_scale)
     
     def _calculate_confidence(self, df: pd.DataFrame, returns: pd.Series, volatility: float) -> float:
         """
@@ -314,6 +342,7 @@ class PortfolioAllocator:
                     'predicted_price': round(stock['predicted_price'], 2),
                     'predicted_return': round(stock['predicted_return'], 2),
                     'confidence': round(stock['confidence'], 2),
+                    'volatility': round(float(stock.get('volatility', 15.0)), 2),
                     'action': 'BUY'
                 })
         

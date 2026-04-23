@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { IconArrowLeft } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
@@ -19,7 +19,7 @@ export default function Terms() {
       <div className="container mx-auto px-6 py-24 max-w-4xl">
         <Link to="/">
           <Button className="btn-secondary mb-8 rounded-xl">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <IconArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
         </Link>

@@ -14,7 +14,7 @@ import {
 } from 'recharts';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlayCircle, BarChart3, TrendingUp, TrendingDown, Activity, Target, Loader2, RefreshCw } from 'lucide-react';
+import { IconPlayerPlay, IconChartBar, IconTrendingUp, IconTrendingDown, IconActivity, IconTarget, IconLoader, IconRefresh } from '@tabler/icons-react';
 import { runBacktest, getErrorMessage, type BacktestResponse, type BacktestRequest } from '@/services/api';
 import { toast } from 'sonner';
 
@@ -78,7 +78,7 @@ export default function BacktestResults() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold flex items-center gap-3">
-                  <BarChart3 className="w-6 h-6 text-cyan-400" />
+                  <IconChartBar className="w-6 h-6 text-cyan-400" />
                   Backtest Results
                 </h1>
                 <p className="text-sm text-gray-400 mt-1">Historical strategy performance analysis</p>
@@ -89,7 +89,7 @@ export default function BacktestResults() {
                   disabled={loading}
                   className="rounded-xl bg-white/5 hover:bg-white/10 border border-white/10"
                 >
-                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                  <IconRefresh className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                   Refresh
                 </Button>
               </div>
@@ -134,7 +134,7 @@ export default function BacktestResults() {
               animate={{ opacity: 1 }}
               className="flex flex-col items-center justify-center py-20"
             >
-              <Loader2 className="w-12 h-12 text-blue-400 animate-spin mb-4" />
+              <IconLoader className="w-12 h-12 text-blue-400 animate-spin mb-4" />
               <p className="text-gray-400">Running backtest simulation...</p>
               <p className="text-sm text-gray-500 mt-2">This may take a few moments</p>
             </motion.div>
@@ -157,7 +157,7 @@ export default function BacktestResults() {
                         Final: ₹{metrics!.final_value.toLocaleString()}
                       </p>
                     </div>
-                    <TrendingUp className="w-8 h-8 text-green-400 opacity-50" />
+                    <IconTrendingUp className="w-8 h-8 text-green-400 opacity-50" />
                   </div>
                 </Card>
 
@@ -172,7 +172,7 @@ export default function BacktestResults() {
                         Risk-adjusted return
                       </p>
                     </div>
-                    <Target className="w-8 h-8 text-blue-400 opacity-50" />
+                    <IconTarget className="w-8 h-8 text-blue-400 opacity-50" />
                   </div>
                 </Card>
 
@@ -187,7 +187,7 @@ export default function BacktestResults() {
                         Peak to trough
                       </p>
                     </div>
-                    <TrendingDown className="w-8 h-8 text-red-400 opacity-50" />
+                    <IconTrendingDown className="w-8 h-8 text-red-400 opacity-50" />
                   </div>
                 </Card>
 
@@ -202,7 +202,7 @@ export default function BacktestResults() {
                         {metrics!.num_trades} trades
                       </p>
                     </div>
-                    <Activity className="w-8 h-8 text-purple-400 opacity-50" />
+                    <IconActivity className="w-8 h-8 text-purple-400 opacity-50" />
                   </div>
                 </Card>
               </motion.div>
@@ -215,7 +215,7 @@ export default function BacktestResults() {
               >
                 <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-green-400" />
+                    <IconTrendingUp className="w-5 h-5 text-green-400" />
                     Portfolio Value Over Time
                   </h3>
                   <ResponsiveContainer width="100%" height={300}>
@@ -269,7 +269,7 @@ export default function BacktestResults() {
               >
                 <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-green-400" />
+                    <IconActivity className="w-5 h-5 text-green-400" />
                     Cumulative Returns
                   </h3>
                   <ResponsiveContainer width="100%" height={200}>
@@ -291,7 +291,7 @@ export default function BacktestResults() {
 
                 <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <TrendingDown className="w-5 h-5 text-red-400" />
+                    <IconTrendingDown className="w-5 h-5 text-red-400" />
                     Drawdown
                   </h3>
                   <ResponsiveContainer width="100%" height={200}>
@@ -355,13 +355,13 @@ export default function BacktestResults() {
               animate={{ opacity: 1 }}
               className="text-center py-20"
             >
-              <BarChart3 className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+              <IconChartBar className="w-16 h-16 text-gray-600 mx-auto mb-4" />
               <p className="text-gray-400 mb-4">No backtest results available</p>
               <Button
                 onClick={() => loadBacktest()}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
-                <PlayCircle className="w-4 h-4 mr-2" />
+                <IconPlayerPlay className="w-4 h-4 mr-2" />
                 Run Backtest
               </Button>
             </motion.div>

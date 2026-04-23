@@ -13,16 +13,7 @@
 //   ComposedChart,
 //   Area
 // } from 'recharts';
-// import {
-//   Brain,
-//   TrendingUp,
-//   Activity,
-//   BarChart3,
-//   Zap,
-//   Target,
-//   Award,
-//   Loader2
-// } from 'lucide-react';
+// import { Icon } from '@tabler/icons-react';
 // import { Card } from '@/components/ui/card';
 // import { Button } from '@/components/ui/button';
 // import { Progress } from '@/components/ui/progress';

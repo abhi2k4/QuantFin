@@ -15,25 +15,7 @@ import {
   Pie,
   Cell
 } from 'recharts';
-import {
-  TrendingUp,
-  TrendingDown,
-  Wallet,
-  DollarSign,
-  Activity,
-  RefreshCw,
-  Loader2,
-  ChevronDown,
-  ArrowUpRight,
-  ArrowDownRight,
-  BarChart3,
-  Sparkles,
-  BrainCircuit,
-  BarChart4,
-  AlertCircle,
-  Edit2,
-  X
-} from 'lucide-react';
+import { IconTrendingUp, IconTrendingDown, IconWallet, IconCurrencyDollar, IconActivity, IconRefresh, IconLoader, IconChevronDown, IconArrowUpRight, IconArrowDownRight, IconChartBar, IconSparkles, IconBrain, IconAlertCircle, IconEdit, IconX } from '@tabler/icons-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -248,9 +230,9 @@ export default function Dashboard() {
   }) || [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white">
+    <div className="min-h-screen bg-[#0d0d0d] text-white">
       {/* Top Bar */}
-      <div className="sticky top-0 z-50 backdrop-blur-xl bg-zinc-950/80 border-b border-white/5">
+      <div className="border-b border-[rgba(255,255,255,0.06)] bg-[rgba(13,13,13,0.9)] backdrop-blur-xl">
         <div className="max-w-[1600px] mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
@@ -260,16 +242,16 @@ export default function Dashboard() {
             <div className="flex gap-3">
               {/* <Button
                 onClick={() => navigate('/analytics')}
-                className="rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0"
+                className="rounded-xl bg-[#c8ff00] text-[#0d0d0d] hover:bg-[#d8ff33] border-0 font-semibold"
               >
-                <BrainCircuit className="w-4 h-4 mr-2" />
+                <IconBrain className="w-4 h-4 mr-2" />
                 ML Analytics
               </Button> */}
               <Button
                 onClick={() => navigate('/backtest')}
-                className="rounded-xl bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white border-0"
+                className="rounded-xl bg-[#c8ff00] text-black hover:bg-[#d8ff33] border-0"
               >
-                <BarChart4 className="w-4 h-4 mr-2" />
+                <IconChartBar className="w-4 h-4 mr-2" />
                 Backtesting
               </Button>
               <Button
@@ -278,9 +260,9 @@ export default function Dashboard() {
                   void loadPortfolioPerformance(timeframe);
                   void loadStrategyComparison(timeframe);
                 }}
-                className="rounded-xl bg-white/5 hover:bg-white/10 border border-white/10"
+                className="rounded-xl bg-[#1a1a1a] hover:bg-[#222] border border-[rgba(255,255,255,0.07)]"
               >
-                <RefreshCw className="w-4 h-4 mr-2" />
+                <IconRefresh className="w-4 h-4 mr-2" />
                 Refresh
               </Button>
             </div>
@@ -307,11 +289,11 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <Card className="bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-green-500/10 backdrop-blur-xl border-white/20 p-6">
+            <Card className="bg-[#141414] border-[rgba(255,255,255,0.07)] p-6">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="p-3 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl">
-                    <BrainCircuit className="w-6 h-6 text-white" />
+                  <div className="p-3 bg-[rgba(200,255,0,0.1)] border border-[rgba(200,255,0,0.2)] rounded-lg">
+                    <IconBrain className="w-6 h-6 text-white" />
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-white">Your ML-Optimized Portfolio</h2>
@@ -327,7 +309,7 @@ export default function Dashboard() {
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-gray-400">Sharpe Ratio</p>
-                    <p className="text-2xl font-bold text-blue-400">
+                    <p className="text-2xl font-bold text-[#c8ff00]">
                       {portfolioMetrics.sharpe_ratio?.toFixed(3) || 'N/A'}
                     </p>
                   </div>
@@ -336,34 +318,34 @@ export default function Dashboard() {
 
               {/* Quick Stats */}
               <div className="grid grid-cols-4 gap-4 mb-6">
-                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                <div className="bg-[#1a1a1a] rounded-lg p-4 border border-[rgba(255,255,255,0.07)]">
                   <div className="flex items-center gap-2 mb-2">
-                    <Wallet className="w-4 h-4 text-purple-400" />
+                    <IconWallet className="w-4 h-4 text-[#a0a0a0]" />
                     <span className="text-xs text-gray-400">Total Stocks</span>
                   </div>
                   <p className="text-2xl font-bold text-white">{allocations.length}</p>
                 </div>
-                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                <div className="bg-[#1a1a1a] rounded-lg p-4 border border-[rgba(255,255,255,0.07)]">
                   <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="w-4 h-4 text-green-400" />
+                    <IconTrendingUp className="w-4 h-4 text-green-400" />
                     <span className="text-xs text-gray-400">Avg Confidence</span>
                   </div>
                   <p className="text-2xl font-bold text-green-400">
                     {(allocations.reduce((sum, a) => sum + a.confidence, 0) / allocations.length * 100).toFixed(1)}%
                   </p>
                 </div>
-                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                <div className="bg-[#1a1a1a] rounded-lg p-4 border border-[rgba(255,255,255,0.07)]">
                   <div className="flex items-center gap-2 mb-2">
-                    <Activity className="w-4 h-4 text-orange-400" />
+                    <IconActivity className="w-4 h-4 text-[#f97316]" />
                     <span className="text-xs text-gray-400">Risk Level</span>
                   </div>
-                  <p className="text-2xl font-bold text-orange-400">
+                  <p className="text-2xl font-bold text-[#f97316]">
                     {portfolioMetrics.expected_risk.toFixed(2)}%
                   </p>
                 </div>
-                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                <div className="bg-[#1a1a1a] rounded-lg p-4 border border-[rgba(255,255,255,0.07)]">
                   <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-4 h-4 text-yellow-400" />
+                    <IconSparkles className="w-4 h-4 text-[#eab308]" />
                     <span className="text-xs text-gray-400">Model</span>
                   </div>
                   <p className="text-lg font-bold text-white">{selectedStrategy}</p>
@@ -382,7 +364,7 @@ export default function Dashboard() {
                     className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/5 hover:border-white/20 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg text-white font-bold text-sm">
+                      <div className="flex items-center justify-center w-8 h-8 bg-[rgba(200,255,0,0.12)] border border-[rgba(200,255,0,0.3)] rounded text-[#c8ff00] font-bold text-sm">
                         #{index + 1}
                       </div>
                       <div>
@@ -489,7 +471,7 @@ export default function Dashboard() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="bg-zinc-900 rounded-2xl border border-white/10 p-6 w-full max-w-md mx-4"
+            className="bg-[#141414] rounded-xl border border-[rgba(255,255,255,0.08)] p-6 w-full max-w-md mx-4"
           >
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -498,9 +480,9 @@ export default function Dashboard() {
               </div>
               <button
                 onClick={() => setShowCashBalanceDialog(false)}
-                className="p-2 rounded-lg hover:bg-white/5 transition-colors"
+                className="p-2 rounded-lg hover:bg-[rgba(200,255,0,0.03)] transition-colors"
               >
-                <X className="w-5 h-5 text-gray-400" />
+                <IconX className="w-5 h-5 text-gray-400" />
               </button>
             </div>
             
@@ -514,7 +496,7 @@ export default function Dashboard() {
                   value={newCashBalance}
                   onChange={(e) => setNewCashBalance(e.target.value)}
                   placeholder="Enter amount"
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 rounded-lg bg-[#1a1a1a] border border-[rgba(255,255,255,0.08)] text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#c8ff00]/30 focus:border-transparent"
                   min="0"
                   step="1000"
                 />
@@ -533,11 +515,11 @@ export default function Dashboard() {
                 <button
                   onClick={handleUpdateCashBalance}
                   disabled={updatingCashBalance}
-                  className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-3 rounded-xl bg-[#c8ff00] hover:bg-[#d8ff33] text-black font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {updatingCashBalance ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <IconLoader className="w-4 h-4 animate-spin" />
                       Updating...
                     </>
                   ) : (
@@ -566,33 +548,33 @@ function PortfolioSummaryCards({ summary, loading, onEditCashBalance }: Portfoli
     {
       title: 'Total Portfolio Value',
       value: summary?.total_value || 0,
-      icon: Wallet,
-      color: 'from-blue-500 to-cyan-600',
-      bgColor: 'bg-blue-500/10',
+      icon: IconWallet,
+      color: '#c8ff00',
+      bgColor: 'bg-[rgba(200,255,0,0.06)]',
       format: 'currency'
     },
     {
       title: 'Cash Balance',
       value: summary?.cash_balance || 0,
-      icon: DollarSign,
-      color: 'from-green-500 to-emerald-600',
-      bgColor: 'bg-green-500/10',
+      icon: IconCurrencyDollar,
+      color: '#c8ff00',
+      bgColor: 'bg-[rgba(200,255,0,0.06)]',
       format: 'currency'
     },
     {
       title: 'Daily Change',
       value: summary?.daily_change_percent || 0,
-      icon: summary?.daily_change_percent && summary.daily_change_percent >= 0 ? TrendingUp : TrendingDown,
-      color: summary?.daily_change_percent && summary.daily_change_percent >= 0 ? 'from-green-500 to-emerald-600' : 'from-red-500 to-orange-600',
-      bgColor: summary?.daily_change_percent && summary.daily_change_percent >= 0 ? 'bg-green-500/10' : 'bg-red-500/10',
+      icon: summary?.daily_change_percent && summary.daily_change_percent >= 0 ? IconTrendingUp : IconTrendingDown,
+      color: summary?.daily_change_percent && summary.daily_change_percent >= 0 ? '#c8ff00' : '#f87171',
+      bgColor: summary?.daily_change_percent && summary.daily_change_percent >= 0 ? 'bg-[rgba(200,255,0,0.06)]' : 'bg-[rgba(248,113,113,0.08)]',
       format: 'percentage'
     },
     {
       title: 'Active Positions',
       value: summary?.positions.length || 0,
-      icon: BarChart3,
-      color: 'from-purple-500 to-pink-600',
-      bgColor: 'bg-purple-500/10',
+      icon: IconChartBar,
+      color: '#c8ff00',
+      bgColor: 'bg-[rgba(200,255,0,0.06)]',
       format: 'number'
     }
   ];
@@ -621,7 +603,7 @@ function PortfolioSummaryCards({ summary, loading, onEditCashBalance }: Portfoli
           transition={{ delay: index * 0.1 }}
           className="relative group"
         >
-          <Card className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6 hover:border-white/20 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10">
+          <Card className="rounded-xl bg-[#141414] border border-[rgba(255,255,255,0.07)] p-6 hover:border-white/20 transition-all duration-300 hover:border-[rgba(200,255,0,0.15)]">
             {/* Edit button for Cash Balance */}
             {card.title === 'Cash Balance' && !loading && (
               <button
@@ -629,18 +611,13 @@ function PortfolioSummaryCards({ summary, loading, onEditCashBalance }: Portfoli
                 className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-200 opacity-0 group-hover:opacity-100"
                 title="Edit Cash Balance"
               >
-                <Edit2 className="w-4 h-4 text-gray-400 hover:text-white" />
+                <IconEdit className="w-4 h-4 text-gray-400 hover:text-white" />
               </button>
             )}
             
             {/* Icon */}
             <div className={`w-12 h-12 rounded-xl ${card.bgColor} flex items-center justify-center mb-4`}>
-              <card.icon className="w-6 h-6" style={{ 
-                background: `linear-gradient(to bottom right, ${card.color.split(' ')[1]}, ${card.color.split(' ')[3]})`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }} />
+              <card.icon className="w-6 h-6 text-[#c8ff00]" />
             </div>
 
             {/* Title */}
@@ -649,7 +626,7 @@ function PortfolioSummaryCards({ summary, loading, onEditCashBalance }: Portfoli
             {/* Value */}
             {loading ? (
               <div className="flex items-center gap-2">
-                <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                <IconLoader className="w-5 h-5 animate-spin text-[#c8ff00]" />
                 <span className="text-gray-500">Loading...</span>
               </div>
             ) : (
@@ -706,7 +683,7 @@ function PerformanceChart({ data, timeframe, onTimeframeChange, loading }: Perfo
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
-      className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6"
+      className="rounded-xl bg-[#141414] border border-[rgba(255,255,255,0.07)] p-6"
     >
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -722,7 +699,7 @@ function PerformanceChart({ data, timeframe, onTimeframeChange, loading }: Perfo
               onClick={() => onTimeframeChange(tf)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 timeframe === tf
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'
+                  ? 'bg-[#c8ff00] text-[#0d0d0d] font-semibold'
                   : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
               }`}
             >
@@ -735,7 +712,7 @@ function PerformanceChart({ data, timeframe, onTimeframeChange, loading }: Perfo
       {/* Warnings */}
       {data?.warnings && data.warnings.length > 0 && (
         <div className="mb-4 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
+          <IconAlertCircle className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
           <div className="text-sm text-yellow-200">
             {data.warnings.map((warning, idx) => (
               <div key={idx}>{warning}</div>
@@ -746,12 +723,12 @@ function PerformanceChart({ data, timeframe, onTimeframeChange, loading }: Perfo
 
       {loading ? (
         <div className="h-[350px] flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          <IconLoader className="w-8 h-8 animate-spin text-[#c8ff00]" />
         </div>
       ) : !data || chartData.length === 0 ? (
         <div className="h-[350px] flex items-center justify-center text-gray-400">
           <div className="text-center">
-            <Activity className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <IconActivity className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <p>No performance data available</p>
           </div>
         </div>
@@ -759,32 +736,32 @@ function PerformanceChart({ data, timeframe, onTimeframeChange, loading }: Perfo
         <>
           {/* Performance Metrics Cards */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-            <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+            <div className="bg-[#1a1a1a] rounded-lg p-3 border border-[rgba(255,255,255,0.07)]">
               <p className="text-xs text-gray-400 mb-1">Initial Value</p>
               <p className="text-lg font-bold">₹{metrics?.initial_value.toLocaleString('en-IN')}</p>
             </div>
-            <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+            <div className="bg-[#1a1a1a] rounded-lg p-3 border border-[rgba(255,255,255,0.07)]">
               <p className="text-xs text-gray-400 mb-1">Final Value</p>
               <p className="text-lg font-bold">₹{metrics?.final_value.toLocaleString('en-IN')}</p>
             </div>
-            <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+            <div className="bg-[#1a1a1a] rounded-lg p-3 border border-[rgba(255,255,255,0.07)]">
               <p className="text-xs text-gray-400 mb-1">Total Return</p>
               <p className={`text-lg font-bold flex items-center gap-1 ${
                 (metrics?.total_return || 0) >= 0 ? 'text-green-400' : 'text-red-400'
               }`}>
-                {(metrics?.total_return || 0) >= 0 ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+                {(metrics?.total_return || 0) >= 0 ? <IconArrowUpRight className="w-4 h-4" /> : <IconArrowDownRight className="w-4 h-4" />}
                 {metrics?.total_return.toFixed(2)}%
               </p>
             </div>
-            <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+            <div className="bg-[#1a1a1a] rounded-lg p-3 border border-[rgba(255,255,255,0.07)]">
               <p className="text-xs text-gray-400 mb-1">Volatility</p>
               <p className="text-lg font-bold">{metrics?.volatility.toFixed(2)}%</p>
             </div>
-            <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+            <div className="bg-[#1a1a1a] rounded-lg p-3 border border-[rgba(255,255,255,0.07)]">
               <p className="text-xs text-gray-400 mb-1">Sharpe Ratio</p>
               <p className="text-lg font-bold">{metrics?.sharpe_ratio.toFixed(2)}</p>
             </div>
-            <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+            <div className="bg-[#1a1a1a] rounded-lg p-3 border border-[rgba(255,255,255,0.07)]">
               <p className="text-xs text-gray-400 mb-1">Max Drawdown</p>
               <p className="text-lg font-bold text-red-400">{metrics?.max_drawdown.toFixed(2)}%</p>
             </div>
@@ -795,11 +772,11 @@ function PerformanceChart({ data, timeframe, onTimeframeChange, loading }: Perfo
             <AreaChart data={dataWithChanges}>
               <defs>
                 <linearGradient id="portfolioGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#c8ff00" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#c8ff00" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
               <XAxis
                 dataKey="date"
                 stroke="#666"
@@ -812,8 +789,8 @@ function PerformanceChart({ data, timeframe, onTimeframeChange, loading }: Perfo
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'rgba(0,0,0,0.95)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  backgroundColor: '#0d0d0d',
+                  border: '1px solid rgba(255,255,255,0.08)',
                   borderRadius: '12px',
                   backdropFilter: 'blur(20px)',
                   padding: '12px'
@@ -844,7 +821,7 @@ function PerformanceChart({ data, timeframe, onTimeframeChange, loading }: Perfo
               <Area
                 type="monotone"
                 dataKey="value"
-                stroke="#3b82f6"
+                stroke="#c8ff00"
                 strokeWidth={2}
                 fill="url(#portfolioGradient)"
                 fillOpacity={1}
@@ -870,7 +847,7 @@ interface AllocationChartProps {
 }
 
 function AllocationChart({ positions, loading }: AllocationChartProps) {
-  const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#ec4899'];
+  const COLORS = ['#c8ff00', '#a0a0a0', '#34d399', '#f59e0b', '#f87171', '#60a5fa'];
 
   const chartData = positions.map((pos, index) => ({
     name: pos.symbol,
@@ -883,7 +860,7 @@ function AllocationChart({ positions, loading }: AllocationChartProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
-      className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6 h-full"
+      className="rounded-xl bg-[#141414] border border-[rgba(255,255,255,0.07)] p-6 h-full"
     >
       <div className="mb-6">
         <h2 className="text-xl font-bold">Portfolio Allocation</h2>
@@ -892,7 +869,7 @@ function AllocationChart({ positions, loading }: AllocationChartProps) {
 
       {loading ? (
         <div className="h-[250px] flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          <IconLoader className="w-8 h-8 animate-spin text-[#c8ff00]" />
         </div>
       ) : chartData.length === 0 ? (
         <div className="h-[250px] flex items-center justify-center text-gray-400">
@@ -917,8 +894,8 @@ function AllocationChart({ positions, loading }: AllocationChartProps) {
               </Pie>
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'rgba(0,0,0,0.95)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  backgroundColor: '#0d0d0d',
+                  border: '1px solid rgba(255,255,255,0.08)',
                   borderRadius: '12px'
                 }}
                 formatter={(value: number) => `${value.toFixed(2)}%`}
@@ -959,11 +936,11 @@ interface PositionsTableProps {
 
 function PositionsTable({ positions, onSort, sortKey, sortOrder, loading }: PositionsTableProps) {
   const SortIcon = ({ column }: { column: keyof Position }) => {
-    if (sortKey !== column) return <ChevronDown className="w-4 h-4 text-gray-600" />;
+    if (sortKey !== column) return <IconChevronDown className="w-4 h-4 text-gray-600" />;
     return sortOrder === 'asc' ? (
-      <ArrowUpRight className="w-4 h-4 text-blue-400" />
+      <IconArrowUpRight className="w-4 h-4 text-[#c8ff00]" />
     ) : (
-      <ArrowDownRight className="w-4 h-4 text-blue-400" />
+      <IconArrowDownRight className="w-4 h-4 text-red-400" />
     );
   };
 
@@ -972,7 +949,7 @@ function PositionsTable({ positions, onSort, sortKey, sortOrder, loading }: Posi
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.6 }}
-      className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6"
+      className="rounded-xl bg-[#141414] border border-[rgba(255,255,255,0.07)] p-6"
     >
       <div className="mb-6">
         <h2 className="text-xl font-bold">Current Positions</h2>
@@ -981,7 +958,7 @@ function PositionsTable({ positions, onSort, sortKey, sortOrder, loading }: Posi
 
       {loading ? (
         <div className="h-[200px] flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          <IconLoader className="w-8 h-8 animate-spin text-[#c8ff00]" />
         </div>
       ) : (
         <div className="overflow-x-auto">
@@ -1037,7 +1014,7 @@ function PositionsTable({ positions, onSort, sortKey, sortOrder, loading }: Posi
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                  className="border-b border-white/5 hover:bg-[rgba(200,255,0,0.03)] transition-colors"
                 >
                   <td className="py-3 px-4 font-medium">{position.symbol}</td>
                   <td className="py-3 px-4 text-right">{position.quantity}</td>
@@ -1088,11 +1065,11 @@ function RebalanceActions({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.7 }}
-      className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6"
+      className="rounded-xl bg-[#141414] border border-[rgba(255,255,255,0.07)] p-6"
     >
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-          <Sparkles className="w-5 h-5" />
+        <div className="w-10 h-10 rounded-lg bg-[rgba(200,255,0,0.08)] border border-[rgba(200,255,0,0.2)] flex items-center justify-center">
+          <IconSparkles className="w-5 h-5" />
         </div>
         <div>
           <h2 className="text-xl font-bold">Portfolio Rebalancing</h2>
@@ -1108,7 +1085,7 @@ function RebalanceActions({
             <select
               value={selectedStrategy}
               onChange={(e) => onStrategyChange(e.target.value as ModelStrategy)}
-              className="w-full text-white appearance-none pl-4 pr-10 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+              className="w-full text-white appearance-none pl-4 pr-10 py-3 rounded-lg bg-[#1a1a1a] border border-[rgba(255,255,255,0.08)] hover:border-[rgba(200,255,0,0.2)] transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#c8ff00]/30/50"
               style={{
                 background: 'rgba(255, 255, 255, 0.05)',
                 color: 'white'
@@ -1120,7 +1097,7 @@ function RebalanceActions({
               <option value="SVM" className="bg-gray-800 text-white">Support Vector Machine</option>
               <option value="ARIMA" className="bg-gray-800 text-white">ARIMA Time Series</option>
             </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <IconChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
           </div>
         </div>
 
@@ -1134,7 +1111,7 @@ function RebalanceActions({
             value={capitalAllocation}
             onChange={(e) => onCapitalChange(e.target.value)}
             placeholder="Enter amount"
-            className="w-full text-white placeholder:text-gray-500 px-4 py-3 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 focus:border-blue-500 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+            className="w-full text-white placeholder:text-gray-600 px-4 py-3 rounded-lg bg-[#1a1a1a] border border-[rgba(255,255,255,0.08)] hover:border-[rgba(200,255,0,0.2)] focus:border-[#c8ff00] transition-all focus:outline-none focus:ring-2 focus:ring-[#c8ff00]/30/50"
             disabled={rebalancing}
           />
         </div>
@@ -1144,16 +1121,16 @@ function RebalanceActions({
           <Button
             onClick={onRebalance}
             disabled={rebalancing || !capitalAllocation}
-            className="w-full h-[48px] rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-[48px] rounded-xl bg-[#c8ff00] hover:bg-[#d8ff33] text-white font-medium transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {rebalancing ? (
               <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                <IconLoader className="w-5 h-5 mr-2 animate-spin" />
                 Rebalancing...
               </>
             ) : (
               <>
-                <Activity className="w-5 h-5 mr-2" />
+                <IconActivity className="w-5 h-5 mr-2" />
                 Rebalance Portfolio
               </>
             )}
@@ -1162,8 +1139,8 @@ function RebalanceActions({
       </div>
 
       {/* Info Box */}
-      <div className="mt-4 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-        <p className="text-sm text-blue-200">
+      <div className="mt-4 p-4 rounded-lg bg-[rgba(200,255,0,0.04)] border border-[rgba(200,255,0,0.15)]">
+        <p className="text-sm text-[rgba(200,255,0,0.75)]">
           <strong>Note:</strong> The {selectedStrategy} model will analyze market conditions and rebalance your portfolio for optimal returns based on predicted stock movements.
         </p>
       </div>
@@ -1190,12 +1167,12 @@ function AllocationTable({ allocations, metrics, strategy }: AllocationTableProp
       animate={{ opacity: 1, y: 0 }}
       className="w-full"
     >
-      <Card className="p-6 bg-gray-800/50 border-gray-700/50 backdrop-blur-sm">
+      <Card className="p-6 bg-[#141414] border-[rgba(255,255,255,0.07)]">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
             <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-purple-400" />
+              <IconSparkles className="w-6 h-6 text-[#a0a0a0]" />
               Allocation Recommendations
             </h3>
             <p className="text-gray-400 text-sm mt-1">
@@ -1213,14 +1190,14 @@ function AllocationTable({ allocations, metrics, strategy }: AllocationTableProp
             </div>
             <div className="text-center">
               <p className="text-xs text-gray-400">Expected Risk</p>
-              <p className="text-lg font-bold text-orange-400">
+              <p className="text-lg font-bold text-[#f97316]">
                 {metrics.expected_risk.toFixed(2)}%
               </p>
             </div>
             {metrics.sharpe_ratio && (
               <div className="text-center">
                 <p className="text-xs text-gray-400">Sharpe Ratio</p>
-                <p className="text-lg font-bold text-blue-400">
+                <p className="text-lg font-bold text-[#c8ff00]">
                   {metrics.sharpe_ratio.toFixed(2)}
                 </p>
               </div>
@@ -1255,7 +1232,7 @@ function AllocationTable({ allocations, metrics, strategy }: AllocationTableProp
                 >
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
+                      <div className="w-8 h-8 rounded-full bg-[rgba(200,255,0,0.12)] border border-[rgba(200,255,0,0.3)] flex items-center justify-center text-[#c8ff00] text-xs font-bold">
                         {allocation.symbol.substring(0, 2)}
                       </div>
                       <span className="text-white font-medium">{allocation.symbol}</span>
@@ -1273,14 +1250,14 @@ function AllocationTable({ allocations, metrics, strategy }: AllocationTableProp
                   <td className="px-4 py-4 text-right text-gray-300">
                     ₹{allocation.buy_price.toFixed(2)}
                   </td>
-                  <td className="px-4 py-4 text-right text-blue-400">
+                  <td className="px-4 py-4 text-right text-[#c8ff00]">
                     ₹{allocation.predicted_price.toFixed(2)}
                   </td>
                   <td className="px-4 py-4 text-right">
                     <span className={`font-semibold ${
                       allocation.predicted_return >= 10 ? 'text-green-400' :
                       allocation.predicted_return >= 5 ? 'text-green-300' :
-                      allocation.predicted_return > 0 ? 'text-yellow-400' :
+                      allocation.predicted_return > 0 ? 'text-[#eab308]' :
                       'text-red-400'
                     }`}>
                       {allocation.predicted_return >= 0 ? '+' : ''}{allocation.predicted_return.toFixed(2)}%
@@ -1291,8 +1268,8 @@ function AllocationTable({ allocations, metrics, strategy }: AllocationTableProp
                       <div className="w-16 h-2 bg-gray-700 rounded-full overflow-hidden">
                         <div 
                           className={`h-full rounded-full transition-all ${
-                            allocation.confidence >= 0.8 ? 'bg-green-500' :
-                            allocation.confidence >= 0.6 ? 'bg-blue-500' :
+                            allocation.confidence >= 0.8 ? 'bg-[#c8ff00]' :
+                            allocation.confidence >= 0.6 ? 'bg-[#c8ff00]/70' :
                             'bg-yellow-500'
                           }`}
                           style={{ width: `${allocation.confidence * 100}%` }}
@@ -1306,8 +1283,8 @@ function AllocationTable({ allocations, metrics, strategy }: AllocationTableProp
                   <td className="px-4 py-4">
                     <div className="flex justify-center">
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        allocation.action === 'BUY' ? 'bg-green-500/20 text-green-400 border border-green-500/50' :
-                        allocation.action === 'HOLD' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/50' :
+                        allocation.action === 'BUY' ? 'bg-[rgba(200,255,0,0.12)] text-[#c8ff00] border border-[rgba(200,255,0,0.3)]' :
+                        allocation.action === 'HOLD' ? 'bg-[rgba(255,255,255,0.05)] text-[#a0a0a0] border border-[rgba(255,255,255,0.1)]' :
                         'bg-red-500/20 text-red-400 border border-red-500/50'
                       }`}>
                         {allocation.action}
@@ -1353,11 +1330,11 @@ function StrategyComparisonChart({ data, timeframe, onTimeframeChange }: Strateg
   
   // Get colors for each strategy
   const strategyColors: Record<string, string> = {
-    'LSTM': '#8b5cf6',      // Purple
-    'Linear': '#3b82f6',    // Blue
-    'SVM': '#10b981',       // Green
+    'LSTM': '#c8ff00',      // Purple
+    'Linear': '#a0a0a0',    // Blue
+    'SVM': '#34d399',       // Green
     'ARIMA': '#f59e0b',     // Orange
-    'NIFTY50': '#ef4444'    // Red
+    'NIFTY50': '#f87171'    // Red
   };
 
   // Prepare chart data
@@ -1422,12 +1399,12 @@ function StrategyComparisonChart({ data, timeframe, onTimeframeChange }: Strateg
       animate={{ opacity: 1, y: 0 }}
       className="w-full mt-6"
     >
-      <Card className="p-6 bg-gray-800/50 border-gray-700/50 backdrop-blur-sm">
+      <Card className="p-6 bg-[#141414] border-[rgba(255,255,255,0.07)]">
         {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
           <div className="flex-1">
             <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-              <BarChart4 className="w-6 h-6 text-blue-400" />
+              <IconChartBar className="w-6 h-6 text-[#c8ff00]" />
               Strategy Performance Comparison
             </h3>
             <p className="text-gray-400 text-sm mt-1">
@@ -1444,7 +1421,7 @@ function StrategyComparisonChart({ data, timeframe, onTimeframeChange }: Strateg
                   onClick={() => onTimeframeChange(tf)}
                   className={`px-4 py-2 rounded-lg font-medium transition-all ${
                     timeframe === tf
-                      ? 'bg-blue-500 text-white'
+                      ? 'bg-[#c8ff00] text-[#0d0d0d] font-semibold'
                       : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                   }`}
                 >
@@ -1455,10 +1432,9 @@ function StrategyComparisonChart({ data, timeframe, onTimeframeChange }: Strateg
             
             {/* Best Strategy Badge */}
             {bestStrategy.name && (
-              <div className="px-4 py-2 rounded-lg bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/50">
+              <div className="px-4 py-2 rounded-lg bg-[rgba(200,255,0,0.06)] border border-[rgba(200,255,0,0.2)]">
                 <p className="text-xs text-gray-400">Best Performer</p>
-                <p className="text-lg font-bold text-green-400">
-                  {bestStrategy.name} • +{bestStrategy.return.toFixed(2)}%
+                <p className="text-lg font-bold text-[#c8ff00]"> {bestStrategy.name} • +{bestStrategy.return.toFixed(2)}%
                 </p>
               </div>
             )}
@@ -1479,7 +1455,7 @@ function StrategyComparisonChart({ data, timeframe, onTimeframeChange }: Strateg
                 className={`px-4 py-2 rounded-lg font-medium transition-all ${
                   isSelected
                     ? 'bg-opacity-20 border-2'
-                    : 'bg-gray-700/50 border border-gray-600 opacity-50 hover:opacity-100'
+                    : 'bg-[#1a1a1a] border border-[rgba(255,255,255,0.08)] opacity-50 hover:opacity-100'
                 }`}
                 style={{
                   backgroundColor: isSelected ? `${color}20` : undefined,
@@ -1506,7 +1482,7 @@ function StrategyComparisonChart({ data, timeframe, onTimeframeChange }: Strateg
         <div className="h-[400px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
               <XAxis 
                 dataKey="date" 
                 stroke="#9ca3af"
@@ -1523,8 +1499,8 @@ function StrategyComparisonChart({ data, timeframe, onTimeframeChange }: Strateg
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#1f2937',
-                  border: '1px solid #374151',
+                  backgroundColor: '#1a1a1a',
+                  border: '1px solid rgba(255,255,255,0.08)',
                   borderRadius: '8px',
                   color: '#fff'
                 }}
@@ -1556,7 +1532,7 @@ function StrategyComparisonChart({ data, timeframe, onTimeframeChange }: Strateg
             return (
               <div
                 key={name}
-                className="p-4 rounded-xl bg-gray-700/30 border border-gray-600/50 hover:border-gray-500/50 transition-all"
+                className="p-4 rounded-xl bg-[#1a1a1a] border border-[rgba(255,255,255,0.07)] hover:border-[rgba(200,255,0,0.2)] transition-all"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <div 
@@ -1674,7 +1650,7 @@ function IndividualModelCharts({ data, timeframe }: IndividualModelChartsProps) 
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: models.indexOf(model) * 0.1 }}
           >
-            <Card className="p-6 bg-gray-800/50 border-gray-700/50 backdrop-blur-sm hover:border-gray-600/50 transition-all">
+            <Card className="p-6 bg-[#141414] border-[rgba(255,255,255,0.07)] hover:border-gray-600/50 transition-all">
               {/* Model Header */}
               <div className="flex justify-between items-start mb-4">
                 <div>
@@ -1702,7 +1678,7 @@ function IndividualModelCharts({ data, timeframe }: IndividualModelChartsProps) 
               <div className="h-[250px] w-full mb-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
                     <XAxis 
                       dataKey="date" 
                       stroke="#9ca3af"
@@ -1719,8 +1695,8 @@ function IndividualModelCharts({ data, timeframe }: IndividualModelChartsProps) 
                     />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#1f2937',
-                        border: '1px solid #374151',
+                        backgroundColor: '#1a1a1a',
+                        border: '1px solid rgba(255,255,255,0.08)',
                         borderRadius: '8px',
                         color: '#fff',
                         fontSize: '12px'
@@ -1778,7 +1754,7 @@ function IndividualModelCharts({ data, timeframe }: IndividualModelChartsProps) 
                     </div>
                     <div className="p-3 rounded-lg bg-gray-700/30">
                       <p className="text-xs text-gray-400 mb-1">Risk</p>
-                      <p className="text-xl font-bold text-orange-400">
+                      <p className="text-xl font-bold text-[#f97316]">
                         {modelData.expected_risk?.toFixed(2)}%
                       </p>
                     </div>
@@ -1823,10 +1799,10 @@ function PredictedVsActualChart({ data, loading }: PredictedVsActualChartProps) 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6"
+        className="rounded-xl bg-[#141414] border border-[rgba(255,255,255,0.07)] p-6"
       >
         <div className="h-[400px] flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          <IconLoader className="w-8 h-8 animate-spin text-[#c8ff00]" />
         </div>
       </motion.div>
     );
@@ -1850,7 +1826,7 @@ function PredictedVsActualChart({ data, loading }: PredictedVsActualChartProps) 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
-      className="rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 p-6"
+      className="rounded-xl bg-[#141414] border border-[rgba(255,255,255,0.07)] p-6"
     >
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -1860,16 +1836,16 @@ function PredictedVsActualChart({ data, loading }: PredictedVsActualChartProps) 
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <BrainCircuit className="w-5 h-5 text-blue-400" />
+          <IconBrain className="w-5 h-5 text-[#c8ff00]" />
           <span className="text-sm font-semibold text-blue-400">{data.strategy} Model</span>
         </div>
       </div>
 
       {/* Performance Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/10 rounded-xl p-4 border border-green-500/20">
+        <div className="bg-[#141414] rounded-lg p-4 border border-[rgba(255,255,255,0.07)]">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="w-4 h-4 text-green-400" />
+            <IconTrendingUp className="w-4 h-4 text-green-400" />
             <span className="text-xs text-gray-400">Actual Return</span>
           </div>
           <p className="text-2xl font-bold text-green-400">
@@ -1880,12 +1856,12 @@ function PredictedVsActualChart({ data, loading }: PredictedVsActualChartProps) 
           </p>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/10 rounded-xl p-4 border border-blue-500/20">
+        <div className="bg-[#141414] rounded-lg p-4 border border-[rgba(255,255,255,0.07)]">
           <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="w-4 h-4 text-blue-400" />
+            <IconSparkles className="w-4 h-4 text-blue-400" />
             <span className="text-xs text-gray-400">Predicted Return</span>
           </div>
-          <p className="text-2xl font-bold text-blue-400">
+          <p className="text-2xl font-bold text-[#c8ff00]">
             {data.returns.predicted >= 0 ? '+' : ''}{data.returns.predicted.toFixed(2)}%
           </p>
           <p className="text-xs text-gray-400 mt-1">
@@ -1893,9 +1869,9 @@ function PredictedVsActualChart({ data, loading }: PredictedVsActualChartProps) 
           </p>
         </div>
 
-        <div className="bg-gradient-to-br from-gray-500/20 to-gray-600/10 rounded-xl p-4 border border-gray-500/20">
+        <div className="bg-[#141414] rounded-lg p-4 border border-[rgba(255,255,255,0.07)]">
           <div className="flex items-center gap-2 mb-2">
-            <BarChart4 className="w-4 h-4 text-gray-400" />
+            <IconChartBar className="w-4 h-4 text-gray-400" />
             <span className="text-xs text-gray-400">Nifty50 Benchmark</span>
           </div>
           <p className="text-2xl font-bold text-gray-300">
@@ -1906,12 +1882,12 @@ function PredictedVsActualChart({ data, loading }: PredictedVsActualChartProps) 
           </p>
         </div>
 
-        <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/10 rounded-xl p-4 border border-purple-500/20">
+        <div className="bg-[#141414] rounded-lg p-4 border border-[rgba(255,255,255,0.07)]">
           <div className="flex items-center gap-2 mb-2">
-            <ArrowUpRight className="w-4 h-4 text-purple-400" />
+            <IconArrowUpRight className="w-4 h-4 text-[#a0a0a0]" />
             <span className="text-xs text-gray-400">Outperformance</span>
           </div>
-          <p className="text-2xl font-bold text-purple-400">
+          <p className="text-2xl font-bold text-[#a0a0a0]">
             {data.returns.outperformance_vs_nifty >= 0 ? '+' : ''}
             {data.returns.outperformance_vs_nifty.toFixed(2)}%
           </p>
@@ -1928,8 +1904,8 @@ function PredictedVsActualChart({ data, loading }: PredictedVsActualChartProps) 
               <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="predictedGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+              <stop offset="5%" stopColor="#c8ff00" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#c8ff00" stopOpacity={0} />
             </linearGradient>
             <linearGradient id="niftyGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#6b7280" stopOpacity={0.2} />
@@ -1984,7 +1960,7 @@ function PredictedVsActualChart({ data, loading }: PredictedVsActualChartProps) 
           <Line
             type="monotone"
             dataKey="predicted"
-            stroke="#3b82f6"
+            stroke="#c8ff00"
             strokeWidth={2}
             strokeDasharray="5 5"
             dot={false}
@@ -2022,7 +1998,7 @@ function PredictedVsActualChart({ data, loading }: PredictedVsActualChartProps) 
       {/* Insights */}
       <div className="mt-6 p-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
         <div className="flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+          <IconAlertCircle className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
           <div>
             <p className="text-sm font-semibold text-blue-400 mb-1">Performance Insights</p>
             <p className="text-sm text-gray-300">

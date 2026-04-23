@@ -1,393 +1,427 @@
 import { motion } from 'framer-motion';
-import { TrendingUp, Bot, Shield, Zap, ArrowRight, BarChart3, Brain, Target, Users, Briefcase, UserCheck, Github, Twitter, Linkedin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { IconTrendingUp, IconRobot, IconShield, IconBolt, IconArrowRight, IconChartBar, IconBrain, IconTarget, IconUsers, IconBriefcase, IconUserCheck, IconBrandGithub, IconBrandTwitter, IconBrandLinkedin, IconActivity } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0 }
+const fadeUp = {
+  hidden:  { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
 };
 
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2
-    }
-  }
+const stagger = {
+  hidden:  {},
+  visible: { transition: { staggerChildren: 0.12 } },
 };
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        {/* Gradient Orbs */}
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
-        
-        <div className="container mx-auto px-6 pt-32 pb-24 relative z-10">
+    <div style={{ minHeight: '100vh' }}>
+
+      {/* ────────────────── HERO ────────────────── */}
+      <section style={{ position: 'relative', overflow: 'hidden' }}>
+        {/* subtle grid bg */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0)',
+          backgroundSize: '40px 40px',
+          pointerEvents: 'none',
+        }} />
+        {/* lime glow orb */}
+        <div style={{
+          position: 'absolute', top: '-200px', left: '50%',
+          transform: 'translateX(-50%)',
+          width: '600px', height: '600px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(200,255,0,0.07) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '7rem 1.5rem 6rem', position: 'relative', zIndex: 1 }}>
           <motion.div
-            className="text-center max-w-5xl mx-auto"
             initial="hidden"
             animate="visible"
-            variants={staggerContainer}
+            variants={stagger}
+            style={{ textAlign: 'center', maxWidth: '780px', margin: '0 auto' }}
           >
-            <motion.div variants={fadeInUp} className="mb-6">
-              <span className="text-5xl mb-4 inline-block">📊</span>
-            </motion.div>
-            
-            <motion.h1
-              variants={fadeInUp}
-              className="text-6xl md:text-8xl font-bold mb-6 leading-tight"
-            >
-              <span className="gradient-text">QuantFin AI</span>
-              <br />
-              <span className="text-4xl md:text-6xl text-gray-300 font-normal">
-                Intelligent Portfolio Management
+            <motion.div variants={fadeUp}>
+              <span className="hero-badge">
+                <span className="pulse-dot" />
+                AI-Powered Portfolio Intelligence
               </span>
+            </motion.div>
+
+            <motion.h1
+              variants={fadeUp}
+              className="heading-xl"
+              style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', marginBottom: '1.25rem', color: 'var(--text-primary)' }}
+            >
+              Smarter investing,<br />
+              <span className="gradient-text">powered by AI</span>
             </motion.h1>
-            
+
             <motion.p
-              variants={fadeInUp}
-              className="text-xl md:text-2xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed"
+              variants={fadeUp}
+              style={{
+                fontSize: 'clamp(1rem, 2vw, 1.2rem)',
+                color: 'var(--text-secondary)',
+                marginBottom: '2.5rem',
+                lineHeight: 1.7,
+                maxWidth: '560px',
+                margin: '0 auto 2.5rem',
+              }}
             >
-              AI-powered ETF portfolio management for the Indian stock market. 
-              Optimize portfolios, predict trends, and maximize returns with confidence.
+              Ensemble ML models, risk-adjusted portfolio optimization,
+              and live Nifty 50 analytics — built for Indian markets.
             </motion.p>
-            
+
+            <motion.div variants={fadeUp} style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Link to="/signup" className="btn-primary" style={{ fontSize: '0.95rem', padding: '0.75rem 2rem' }}>
+                Start for free
+                <IconArrowRight style={{ width: '16px', height: '16px' }} />
+              </Link>
+              <Link to="/dashboard" className="btn-secondary" style={{ fontSize: '0.95rem', padding: '0.75rem 2rem' }}>
+                Live demo
+              </Link>
+            </motion.div>
+
+            {/* Trust strip */}
             <motion.div
-              variants={fadeInUp}
-              className="flex gap-4 justify-center flex-wrap"
+              variants={fadeUp}
+              style={{ marginTop: '3rem', display: 'flex', justifyContent: 'center', gap: '2.5rem', flexWrap: 'wrap' }}
             >
-              <Link to="/dashboard">
-                <Button className="btn-primary text-base px-8 py-3.5 h-auto rounded-xl group">
-                  Try QuantFin
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link to="/signup">
-                <Button className="btn-secondary text-base px-8 py-3.5 h-auto rounded-xl">
-                  Get Started Free
-                </Button>
-              </Link>
+              {[
+                { value: '50+', label: 'Nifty 50 stocks' },
+                { value: '4',   label: 'ML models' },
+                { value: '10y', label: 'Backtest depth' },
+                { value: '99%', label: 'Uptime' },
+              ].map((s) => (
+                <div key={s.label} style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#c8ff00', fontFamily: "'Space Grotesk', sans-serif" }}>{s.value}</div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>{s.label}</div>
+                </div>
+              ))}
             </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* About Section */}
-      <section className="section-padding bg-gradient-to-b from-transparent to-white/5">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="text-center mb-16"
-          >
-            <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-bold mb-6 text-white">
-              Smarter Decisions, Powered by AI
-            </motion.h2>
-            <motion.p variants={fadeInUp} className="text-xl text-gray-400 max-w-3xl mx-auto">
-              QuantFin AI leverages advanced machine learning algorithms to empower investors 
-              with smarter, data-driven decisions.
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
-          >
-            {[
-              {
-                icon: Bot,
-                title: 'ML Predictions',
-                emoji: '🤖',
-                desc: 'Ensemble of 4 models (LSTM, Linear/Logistic Regression, SVM) trained on Nifty 50 stocks',
-                gradient: 'from-blue-500/20 to-cyan-500/20',
-                iconColor: 'text-blue-400'
-              },
-              {
-                icon: BarChart3,
-                title: 'Portfolio Optimization',
-                emoji: '📈',
-                desc: 'Risk-adjusted allocation strategies with automated rebalancing and comprehensive backtesting',
-                gradient: 'from-emerald-500/20 to-teal-500/20',
-                iconColor: 'text-emerald-400'
-              },
-              {
-                icon: Shield,
-                title: 'Risk Management',
-                emoji: '🛡️',
-                desc: 'Sharpe ratio, maximum drawdown, volatility analysis with real-time risk metrics',
-                gradient: 'from-purple-500/20 to-pink-500/20',
-                iconColor: 'text-purple-400'
-              },
-              {
-                icon: Zap,
-                title: 'Real-time Insights',
-                emoji: '⚡',
-                desc: 'Live yfinance data integration with technical indicators (RSI, MACD, Bollinger Bands)',
-                gradient: 'from-yellow-500/20 to-orange-500/20',
-                iconColor: 'text-yellow-400'
-              }
-            ].map((feature, i) => (
-              <motion.div
-                key={i}
-                variants={fadeInUp}
-                className="card group relative overflow-hidden"
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
-                <div className="relative z-10">
-                  <div className="text-4xl mb-4">{feature.emoji}</div>
-                  <h3 className="text-xl font-bold mb-3 text-white">{feature.title}</h3>
-                  <p className="text-gray-400 leading-relaxed text-sm">{feature.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="section-padding">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="text-center mb-16"
-          >
-            <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-bold mb-6 text-white">
-              How It Works
-            </motion.h2>
-            <motion.p variants={fadeInUp} className="text-xl text-gray-400">
-              Three simple steps to optimize your portfolio
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto"
-          >
-            {[
-              { step: '01', title: 'Connect', desc: 'Link your portfolio or upload historical data', icon: Target, color: 'text-blue-400' },
-              { step: '02', title: 'Analyze', desc: 'AI models process data and identify patterns', icon: Brain, color: 'text-purple-400' },
-              { step: '03', title: 'Optimize', desc: 'Get actionable insights and recommendations', icon: TrendingUp, color: 'text-emerald-400' }
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                variants={fadeInUp}
-                className="relative"
-              >
-                <div className="stat-card text-center relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 text-8xl font-bold text-white/5">{item.step}</div>
-                  <div className="relative z-10">
-                    <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/5 border border-white/10 mb-6 ${item.color}`}>
-                      <item.icon className="w-8 h-8" />
-                    </div>
-                    <h3 className="text-2xl font-bold mb-3 text-white">{item.title}</h3>
-                    <p className="text-gray-400">{item.desc}</p>
-                  </div>
-                </div>
-                {i < 2 && (
-                  <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-gradient-to-r from-white/20 to-transparent"></div>
-                )}
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Tech Stack Section */}
-      <section className="section-padding bg-gradient-to-b from-transparent to-white/5">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="text-center mb-16"
-          >
-            <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-bold mb-6 text-white">
-              Powered by Cutting-Edge Technology
-            </motion.h2>
-            <motion.p variants={fadeInUp} className="text-xl text-gray-400">
-              Built with industry-leading tools and frameworks
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto"
-          >
-            {[
-              { title: 'Backend', tech: ['FastAPI', 'Python 3.11', 'TensorFlow', 'scikit-learn', 'yfinance'] },
-              { title: 'Frontend', tech: ['React 18', 'TypeScript', 'Vite', 'Tailwind CSS', 'Framer Motion'] },
-              { title: 'ML Models', tech: ['LSTM Neural Network', 'Linear Regression', 'Logistic Regression', 'SVM'] }
-            ].map((stack, i) => (
-              <motion.div
-                key={i}
-                variants={fadeInUp}
-                className="card-flat"
-              >
-                <h3 className="text-xl font-bold mb-4 text-white">{stack.title}</h3>
-                <div className="flex flex-wrap gap-2">
-                  {stack.tech.map((item, j) => (
-                    <span
-                      key={j}
-                      className="badge badge-info"
-                    >
-                      {item}
-                    </span>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Target Users Section */}
-      <section className="section-padding">
-        <div className="container mx-auto px-6">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="text-center mb-16"
-          >
-            <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl font-bold mb-6 text-white">
-              Built for Professionals
-            </motion.h2>
-            <motion.p variants={fadeInUp} className="text-xl text-gray-400">
-              Trusted by investors and advisors across India
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto"
-          >
-            {[
-              { icon: Users, title: 'Retail Investors', desc: 'Make informed decisions with AI-powered insights and predictions' },
-              { icon: Briefcase, title: 'Portfolio Managers', desc: 'Optimize client portfolios with advanced risk-adjusted strategies' },
-              { icon: UserCheck, title: 'Financial Advisors', desc: 'Provide data-driven recommendations backed by ML models' }
-            ].map((user, i) => (
-              <motion.div
-                key={i}
-                variants={fadeInUp}
-                className="card text-center group"
-              >
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/10 mb-6 group-hover:scale-110 transition-transform">
-                  <user.icon className="w-10 h-10 text-blue-400" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4 text-white">{user.title}</h3>
-                <p className="text-gray-400">{user.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="section-padding">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeInUp}
-          className="relative overflow-hidden bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-blue-500/10 border-y border-white/10"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-500/5 to-transparent"></div>
-          <div className="container mx-auto px-6 py-20 relative z-10 text-center">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">
-              Ready to Transform Your Portfolio?
-            </h2>
-            <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
-              Join thousands of investors leveraging AI for smarter investment decisions
-            </p>
-            <Link to="/signup">
-              <Button className="btn-primary text-base px-8 py-3.5 h-auto rounded-xl">
-                Get Started Free
-              </Button>
-            </Link>
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-white/5 bg-black/40 backdrop-blur-xl">
-        <div className="container mx-auto px-6 py-12">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <TrendingUp className="w-6 h-6 text-blue-400" />
-                <span className="text-xl font-bold gradient-text">QuantFin AI</span>
-              </div>
-              <p className="text-gray-400 text-sm">
-                AI-powered portfolio management for the Indian stock market
+      {/* ────────────────── FEATURES ────────────────── */}
+      <section style={{ padding: '5rem 0', borderTop: '1px solid var(--border)' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem' }}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            <motion.div variants={fadeUp} style={{ textAlign: 'center', marginBottom: '3rem' }}>
+              <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#c8ff00', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>
+                Capabilities
               </p>
+              <h2 className="heading-lg" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', color: 'var(--text-primary)' }}>
+                Everything you need to trade smarter
+              </h2>
+            </motion.div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1px', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden' }}>
+              {[
+                {
+                  icon: IconRobot,
+                  title: 'ML Predictions',
+                  desc: 'Ensemble of LSTM, Linear/Logistic Regression & SVM models trained on Nifty 50 — voted consensus signals.',
+                },
+                {
+                  icon: IconChartBar,
+                  title: 'Portfolio Optimization',
+                  desc: 'Risk-adjusted allocation with automated rebalancing, efficient frontier analysis, and comprehensive backtesting.',
+                },
+                {
+                  icon: IconShield,
+                  title: 'Risk Management',
+                  desc: 'Sharpe ratio, max drawdown, volatility analysis, and real-time risk metrics keep your exposure in check.',
+                },
+                {
+                  icon: IconBolt,
+                  title: 'Live Market Data',
+                  desc: 'Real-time yfinance integration with RSI, MACD, Bollinger Bands, and 20+ technical indicators.',
+                },
+              ].map((f, i) => (
+                <motion.div
+                  key={i}
+                  variants={fadeUp}
+                  style={{
+                    background: 'var(--bg-surface)',
+                    padding: '2rem',
+                    cursor: 'default',
+                    transition: 'background 0.2s ease',
+                  }}
+                  whileHover={{ background: 'var(--bg-elevated)' }}
+                >
+                  <div className="feature-icon" style={{ marginBottom: '1.25rem' }}>
+                    <f.icon style={{ width: '20px', height: '20px' }} />
+                  </div>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.6rem' }}>{f.title}</h3>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>{f.desc}</p>
+                </motion.div>
+              ))}
             </div>
-            
-            <div>
-              <h4 className="font-semibold mb-4 text-white">Company</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
-                <li><Link to="/contact" className="hover:text-white transition-colors">Contact</Link></li>
-                <li><a href="#careers" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#blog" className="hover:text-white transition-colors">Blog</a></li>
-              </ul>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ────────────────── HOW IT WORKS ────────────────── */}
+      <section style={{ padding: '5rem 0' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem' }}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            <motion.div variants={fadeUp} style={{ textAlign: 'center', marginBottom: '3rem' }}>
+              <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#c8ff00', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>
+                Workflow
+              </p>
+              <h2 className="heading-lg" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', color: 'var(--text-primary)' }}>
+                Three steps to better returns
+              </h2>
+            </motion.div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+              {[
+                { step: '01', icon: IconTarget,    title: 'Connect',  desc: 'Link your portfolio or select from Nifty 50 stocks to begin analysis.' },
+                { step: '02', icon: IconBrain,     title: 'Analyze',  desc: 'Our ensemble of ML models processes historical and live data to surface patterns.' },
+                { step: '03', icon: IconTrendingUp,title: 'Optimize', desc: 'Receive actionable allocation recommendations and risk-adjusted strategies.' },
+              ].map((item, i) => (
+                <motion.div key={i} variants={fadeUp} className="card" style={{ position: 'relative' }}>
+                  <div style={{
+                    position: 'absolute', top: '1.5rem', right: '1.5rem',
+                    fontFamily: "'Space Grotesk', sans-serif",
+                    fontSize: '2.5rem', fontWeight: 700,
+                    color: 'rgba(255,255,255,0.04)',
+                    lineHeight: 1,
+                  }}>{item.step}</div>
+                  <div style={{
+                    width: '40px', height: '40px', borderRadius: '8px',
+                    background: 'rgba(200,255,0,0.08)',
+                    border: '1px solid rgba(200,255,0,0.2)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginBottom: '1rem', color: '#c8ff00',
+                  }}>
+                    <item.icon style={{ width: '18px', height: '18px' }} />
+                  </div>
+                  <h3 style={{ fontWeight: 600, fontSize: '1.05rem', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>{item.title}</h3>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>{item.desc}</p>
+                </motion.div>
+              ))}
             </div>
-            
-            <div>
-              <h4 className="font-semibold mb-4 text-white">Legal</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
-                <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
-                <li><Link to="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link></li>
-              </ul>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ────────────────── TECH STACK ────────────────── */}
+      <section style={{ padding: '5rem 0', borderTop: '1px solid var(--border)' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem' }}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            <motion.div variants={fadeUp} style={{ textAlign: 'center', marginBottom: '3rem' }}>
+              <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#c8ff00', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>
+                Stack
+              </p>
+              <h2 className="heading-lg" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', color: 'var(--text-primary)' }}>
+                Production-grade infrastructure
+              </h2>
+            </motion.div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+              {[
+                { title: 'Backend',   tech: ['FastAPI', 'Python 3.11', 'TensorFlow', 'scikit-learn', 'yfinance'] },
+                { title: 'Frontend',  tech: ['React 18', 'TypeScript', 'Vite', 'Tailwind CSS', 'Framer Motion'] },
+                { title: 'ML Models', tech: ['LSTM Neural Net', 'Linear Regression', 'Logistic Regression', 'SVM'] },
+              ].map((stack, i) => (
+                <motion.div key={i} variants={fadeUp} className="card-flat">
+                  <h3 style={{ fontSize: '0.85rem', fontWeight: 600, color: '#c8ff00', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{stack.title}</h3>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    {stack.tech.map((t, j) => (
+                      <span key={j} className="badge badge-info">{t}</span>
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
             </div>
-            
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ────────────────── FOR WHO ────────────────── */}
+      <section style={{ padding: '5rem 0' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem' }}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
+            <motion.div variants={fadeUp} style={{ textAlign: 'center', marginBottom: '3rem' }}>
+              <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#c8ff00', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem' }}>
+                Who it's for
+              </p>
+              <h2 className="heading-lg" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', color: 'var(--text-primary)' }}>
+                Built for serious investors
+              </h2>
+            </motion.div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+              {[
+                { icon: IconUsers,      title: 'Retail Investors',    desc: 'Data-driven decisions without needing a finance degree.' },
+                { icon: IconBriefcase,  title: 'Portfolio Managers',  desc: 'Scalable risk-adjusted strategies for client portfolios.' },
+                { icon: IconUserCheck,  title: 'Financial Advisors',  desc: 'ML-backed recommendations your clients can trust.' },
+              ].map((u, i) => (
+                <motion.div key={i} variants={fadeUp} className="card" style={{ textAlign: 'center' }}>
+                  <div style={{
+                    width: '48px', height: '48px', borderRadius: '10px',
+                    background: 'rgba(200,255,0,0.06)',
+                    border: '1px solid rgba(200,255,0,0.15)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    margin: '0 auto 1rem', color: '#c8ff00',
+                  }}>
+                    <u.icon style={{ width: '22px', height: '22px' }} />
+                  </div>
+                  <h3 style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>{u.title}</h3>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>{u.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ────────────────── CTA ────────────────── */}
+      <section style={{ padding: '5rem 0', borderTop: '1px solid var(--border)' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem' }}>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeUp}
+            style={{
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border)',
+              borderRadius: '16px',
+              padding: 'clamp(2.5rem, 5vw, 4rem)',
+              textAlign: 'center',
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: 'radial-gradient(ellipse at 50% 0%, rgba(200,255,0,0.06) 0%, transparent 70%)',
+              pointerEvents: 'none',
+            }} />
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+                <div style={{
+                  width: '56px', height: '56px', borderRadius: '12px',
+                  background: 'rgba(200,255,0,0.1)',
+                  border: '1px solid rgba(200,255,0,0.3)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#c8ff00',
+                }}>
+                  <IconActivity style={{ width: '26px', height: '26px' }} />
+                </div>
+              </div>
+              <h2 className="heading-lg" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.5rem)', color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
+                Ready to elevate your portfolio?
+              </h2>
+              <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '2rem', maxWidth: '440px', margin: '0 auto 2rem' }}>
+                Join investors already using AI to make smarter decisions in Indian markets.
+              </p>
+              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <Link to="/signup" className="btn-primary" style={{ fontSize: '0.95rem', padding: '0.75rem 2rem' }}>
+                  Get started free
+                  <IconArrowRight style={{ width: '16px', height: '16px' }} />
+                </Link>
+                <Link to="/dashboard" className="btn-secondary" style={{ fontSize: '0.95rem', padding: '0.75rem 2rem' }}>
+                  View demo
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ────────────────── FOOTER ────────────────── */}
+      <footer style={{ borderTop: '1px solid var(--border)', padding: '3rem 0 2rem' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '2rem', marginBottom: '2.5rem' }}>
             <div>
-              <h4 className="font-semibold mb-4 text-white">Connect</h4>
-              <div className="flex gap-3">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                <IconTrendingUp style={{ width: '18px', height: '18px', color: '#c8ff00' }} />
+                <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '0.95rem' }}>
+                  QuantFin<span style={{ color: '#c8ff00' }}>AI</span>
+                </span>
+              </div>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                AI-powered portfolio management for Indian markets.
+              </p>
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
                 {[
-                  { icon: Twitter, href: 'https://twitter.com/quantfin_ai' },
-                  { icon: Linkedin, href: 'https://linkedin.com/company/quantfin-ai' },
-                  { icon: Github, href: 'https://github.com/abhi2k4/QuantFin' }
-                ].map((social, i) => (
+                  { icon: IconBrandTwitter,  href: 'https://twitter.com/quantfin_ai' },
+                  { icon: IconBrandLinkedin, href: 'https://linkedin.com/company/quantfin-ai' },
+                  { icon: IconBrandGithub,   href: 'https://github.com/abhi2k4/QuantFin' },
+                ].map((s, i) => (
                   <a
                     key={i}
-                    href={social.href}
+                    href={s.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-blue-500/20 hover:border-blue-500/50 transition-all"
+                    style={{
+                      width: '32px', height: '32px', borderRadius: '7px',
+                      border: '1px solid var(--border)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: 'var(--text-muted)',
+                      transition: 'border-color 0.2s, color 0.2s',
+                    }}
+                    onMouseOver={e => {
+                      (e.currentTarget as HTMLElement).style.borderColor = 'rgba(200,255,0,0.3)';
+                      (e.currentTarget as HTMLElement).style.color = '#c8ff00';
+                    }}
+                    onMouseOut={e => {
+                      (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
+                      (e.currentTarget as HTMLElement).style.color = 'var(--text-muted)';
+                    }}
                   >
-                    <social.icon className="w-5 h-5 text-gray-400 hover:text-blue-400" />
+                    <s.icon style={{ width: '14px', height: '14px' }} />
                   </a>
                 ))}
               </div>
             </div>
+
+            <div>
+              <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Product</h4>
+              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {[
+                  { label: 'Dashboard',  to: '/dashboard' },
+                  { label: 'Solutions',  to: '/solutions' },
+                  { label: 'Technology', to: '/technology' },
+                ].map(l => (
+                  <li key={l.label}><Link to={l.to} style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{l.label}</Link></li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Company</h4>
+              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {[
+                  { label: 'Contact', to: '/contact' },
+                  { label: 'About',   to: '/about' },
+                ].map(l => (
+                  <li key={l.label}><Link to={l.to} style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{l.label}</Link></li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Legal</h4>
+              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {[
+                  { label: 'Privacy Policy', to: '/privacy' },
+                  { label: 'Terms of Service', to: '/terms' },
+                  { label: 'Disclaimer',       to: '/disclaimer' },
+                ].map(l => (
+                  <li key={l.label}><Link to={l.to} style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{l.label}</Link></li>
+                ))}
+              </ul>
+            </div>
           </div>
-          
-          <div className="border-t border-white/5 pt-8 text-center text-gray-400 text-sm">
-            <p>© 2025 QuantFin AI. All rights reserved. Built with ❤️ for investors.</p>
+
+          <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>© 2025 QuantFin AI. All rights reserved.</p>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Not financial advice. For educational purposes only.</p>
           </div>
         </div>
       </footer>

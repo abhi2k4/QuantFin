@@ -9,16 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
-import {
-  TrendingUp,
-  Activity,
-  Target,
-  BarChart3,
-  Loader2,
-  ChevronDown,
-  Sparkles,
-  ShieldCheck
-} from 'lucide-react';
+import { IconTrendingUp, IconActivity, IconTarget, IconChartBar, IconLoader, IconChevronDown, IconSparkles, IconShieldCheck } from '@tabler/icons-react';
 import {
   getAnalyticsKPIs,
   getModelPerformance,
@@ -90,7 +81,7 @@ export default function Analytics() {
             {/* Title */}
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                <BarChart3 className="w-5 h-5" />
+                <IconChartBar className="w-5 h-5" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold">Analytics Dashboard</h1>
@@ -112,7 +103,7 @@ export default function Analytics() {
                   <option value="6M">6 Months</option>
                   <option value="1Y">1 Year</option>
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <IconChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
 
               {/* Stock Selector */}
@@ -127,7 +118,7 @@ export default function Analytics() {
                   <option value="HDFCBANK">HDFCBANK</option>
                   <option value="INFY">INFY</option>
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <IconChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
 
               {/* Model Filter */}
@@ -143,7 +134,7 @@ export default function Analytics() {
                   <option value="SVM">SVM Model</option>
                   <option value="All">All Models</option>
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <IconChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               </div>
             </div>
           </div>
@@ -178,7 +169,7 @@ function KPICards({ kpis, loading }: KPICardsProps) {
       title: 'Portfolio Return',
       value: kpis?.portfolio_return,
       suffix: '%',
-      icon: TrendingUp,
+      icon: IconTrendingUp,
       color: 'from-green-500 to-emerald-600',
       bgColor: 'bg-green-500/10',
       trend: 'up'
@@ -187,7 +178,7 @@ function KPICards({ kpis, loading }: KPICardsProps) {
       title: 'Risk Metric',
       value: kpis?.risk_metric,
       suffix: '',
-      icon: ShieldCheck,
+      icon: IconShieldCheck,
       color: 'from-blue-500 to-cyan-600',
       bgColor: 'bg-blue-500/10',
       trend: 'neutral'
@@ -196,7 +187,7 @@ function KPICards({ kpis, loading }: KPICardsProps) {
       title: 'Volatility',
       value: kpis?.volatility,
       suffix: '%',
-      icon: Activity,
+      icon: IconActivity,
       color: 'from-orange-500 to-amber-600',
       bgColor: 'bg-orange-500/10',
       trend: 'neutral'
@@ -205,7 +196,7 @@ function KPICards({ kpis, loading }: KPICardsProps) {
       title: 'Sharpe Ratio',
       value: kpis?.sharpe_ratio,
       suffix: '',
-      icon: Target,
+      icon: IconTarget,
       color: 'from-purple-500 to-pink-600',
       bgColor: 'bg-purple-500/10',
       trend: 'up'
@@ -234,7 +225,7 @@ function KPICards({ kpis, loading }: KPICardsProps) {
             {/* Value */}
             {loading ? (
               <div className="flex items-center gap-2">
-                <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                <IconLoader className="w-5 h-5 animate-spin text-blue-500" />
                 <span className="text-gray-500">Loading...</span>
               </div>
             ) : (
@@ -252,7 +243,7 @@ function KPICards({ kpis, loading }: KPICardsProps) {
             {/* Trend indicator */}
             {!loading && kpi.trend === 'up' && (
               <div className="mt-3 flex items-center gap-1 text-green-500 text-sm">
-                <TrendingUp className="w-4 h-4" />
+                <IconTrendingUp className="w-4 h-4" />
                 <span>Positive</span>
               </div>
             )}
@@ -284,13 +275,13 @@ function ModelPerformanceSection({ data, loading }: ModelPerformanceSectionProps
           <p className="text-sm text-gray-400 mt-1">Accuracy and returns comparison across all models</p>
         </div>
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-          <Sparkles className="w-5 h-5" />
+          <IconSparkles className="w-5 h-5" />
         </div>
       </div>
 
       {loading ? (
         <div className="h-[400px] flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          <IconLoader className="w-8 h-8 animate-spin text-blue-500" />
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -1,421 +1,265 @@
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
-import {
-  LayoutDashboard,
-  TrendingUp,
-  Brain,
-  Menu,
-  Sun,
-  Moon,
-  Lightbulb,
-  Cpu,
-  Users,
-  BarChart3
-  // LineChart
-} from 'lucide-react';
+import { IconLayoutDashboard, IconTrendingUp, IconBrain, IconMenu2, IconChartBar, IconBulb, IconCpu, IconX } from '@tabler/icons-react';
 import { Toaster } from 'sonner';
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
-
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useTheme } from '@/components/theme-provider';
+import { SignedIn, SignedOut, UserButton } from '@/lib/clerk';
 
 // Pages
-import LandingPage from '@/pages/LandingPage';
-import Dashboard from '@/pages/Dashboard';
+import LandingPage   from '@/pages/LandingPage';
+import Dashboard     from '@/pages/Dashboard';
 import ModelInsights from '@/pages/ModelInsights';
-import BacktestResults from '@/pages/BacktestResults';
-import BacktestPage from '@/pages/BacktestPage';
-import SettingsPage from '@/pages/SettingsPage';
-import Solutions from '@/pages/Solutions';
-import Technology from '@/pages/Technology';
-import About from '@/pages/About';
-import Contact from '@/pages/Contact';
-import Signup from '@/pages/Signup';
-import Signin from '@/pages/Signin';
-import Privacy from '@/pages/Privacy';
-import Terms from '@/pages/Terms';
-import Disclaimer from '@/pages/Disclaimer';
-// import Analytics from '@/pages/dashboard/Analytics';
+import BacktestPage  from '@/pages/BacktestPage';
+import SettingsPage  from '@/pages/SettingsPage';
+import Solutions     from '@/pages/Solutions';
+import Technology    from '@/pages/Technology';
+import About         from '@/pages/About';
+import Contact       from '@/pages/Contact';
+import Signup        from '@/pages/Signup';
+import Signin        from '@/pages/Signin';
+import Privacy       from '@/pages/Privacy';
+import Terms         from '@/pages/Terms';
+import Disclaimer    from '@/pages/Disclaimer';
 
 const navItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-  // { icon: LineChart, label: 'Analytics', path: '/analytics' },
-  { icon: Brain, label: 'Models', path: '/models' },
-  { icon: BarChart3, label: 'Backtest', path: '/backtest' },
-  { icon: Lightbulb, label: 'Solutions', path: '/solutions' },
-  { icon: Cpu, label: 'Technology', path: '/technology' },
+  { icon: IconLayoutDashboard, label: 'Dashboard',  path: '/dashboard' },
+  { icon: IconBrain,           label: 'Models',     path: '/models'    },
+  { icon: IconChartBar,       label: 'Backtest',   path: '/backtest'  },
+  { icon: IconBulb,       label: 'Solutions',  path: '/solutions' },
+  { icon: IconCpu,             label: 'Technology', path: '/technology'},
 ];
 
 const pageVariants = {
-  initial: { opacity: 0, x: -20 },
-  animate: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: 20 }
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0 },
+  exit:    { opacity: 0, y: -8 },
 };
 
 function App() {
-  const location = useLocation();
-  const { theme, setTheme } = useTheme();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  const NavLinks = ({ onClick }: { onClick?: () => void }) => (
-    <nav className="space-y-3 p-4">
-      {navItems.map((item) => {
-        const isActive = location.pathname === item.path;
-        return (
-          <Link
-            key={item.path}
-            to={item.path}
-            onClick={onClick}
-            className={`flex items-center gap-3 px-5 py-3.5 rounded-2xl transition-all ${
-              isActive
-                ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <item.icon className="w-5 h-5" />
-            <span className="font-medium">{item.label}</span>
-          </Link>
-        );
-      })}
-    </nav>
-  );
+  const location   = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen">
-      {/* Toast Notifications */}
-      <Toaster 
-        position="top-right" 
-        theme={theme === 'dark' ? 'dark' : 'light'}
-        richColors 
-      />
-      
-      {/* Top Navbar - Softer, more elegant */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-black/40 backdrop-blur-xl">
-        <div className="container flex h-20 items-center px-6">
-          {/* Mobile Menu */}
-          <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden mr-2 hover:bg-white/5">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-64 bg-navy-900 border-navy-700">
-              <div className="py-4">
-                <h2 className="text-xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                  QuantFin AI
-                </h2>
-                <NavLinks onClick={() => setSidebarOpen(false)} />
-              </div>
-            </SheetContent>
-          </Sheet>
+    <div className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
+      <Toaster position="top-right" theme="dark" richColors />
 
+      {/* ── TOP NAV ── */}
+      <header
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+          background: 'rgba(13,13,13,0.88)',
+          backdropFilter: 'blur(18px)',
+          borderBottom: '1px solid var(--border)',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1280px',
+            margin: '0 auto',
+            padding: '0 1.5rem',
+            height: '60px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '2rem',
+          }}
+        >
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3">
-            <TrendingUp className="w-7 h-7 text-blue-400" />
-            <span className="text-xl font-bold gradient-text">
-              QuantFin AI
+          <Link
+            to="/"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}
+          >
+            <IconTrendingUp style={{ width: '20px', height: '20px', color: '#c8ff00' }} />
+            <span
+              style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontWeight: 700,
+                fontSize: '1rem',
+                color: '#f5f5f5',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              QuantFin<span style={{ color: '#c8ff00' }}>AI</span>
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex mx-auto">
-            <div className="flex items-center gap-1 bg-white/5 backdrop-blur-xl rounded-full p-1.5 border border-white/10">
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex" style={{ flex: 1, justifyContent: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path;
                 return (
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-full transition-all text-xs font-medium ${
-                      isActive
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                        : 'text-gray-400 hover:text-white hover:bg-white/5'
-                    }`}
-                    title={item.label}
+                    className={`nav-link${isActive ? ' active' : ''}`}
                   >
-                    <item.icon className="w-4 h-4" />
-                    <span className="hidden xl:inline">{item.label}</span>
+                    <item.icon style={{ width: '15px', height: '15px' }} />
+                    <span>{item.label}</span>
                   </Link>
                 );
               })}
             </div>
-          </div>
+          </nav>
 
-          {/* Theme Toggle & CTA */}
-          <div className="ml-auto flex items-center gap-4">
-            <Link to="/contact" className="hidden md:block text-sm font-medium text-gray-400 hover:text-white transition-colors">
+          {/* Right side */}
+          <div
+            style={{
+              marginLeft: 'auto',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              flexShrink: 0,
+            }}
+          >
+            <Link
+              to="/contact"
+              className="hidden md:block"
+              style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}
+            >
               Contact
             </Link>
-            
-            {/* Clerk Authentication */}
+
             <SignedOut>
-              <Link to="/signup">
-                <Button className="btn-primary px-6 py-2 text-sm rounded-xl">
-                  Try QuantFin
-                </Button>
+              <Link
+                to="/signin"
+                className="hidden md:block"
+                style={{
+                  fontSize: '0.85rem',
+                  color: 'var(--text-secondary)',
+                  padding: '0.45rem 0.85rem',
+                  borderRadius: '6px',
+                  transition: 'color 0.2s',
+                }}
+              >
+                Sign in
+              </Link>
+              <Link
+                to="/signup"
+                className="btn-primary"
+                style={{ fontSize: '0.82rem', padding: '0.5rem 1.2rem' }}
+              >
+                Get started
               </Link>
             </SignedOut>
+
             <SignedIn>
-              <UserButton 
-                appearance={{
-                  elements: {
-                    avatarBox: 'w-10 h-10'
-                  }
-                }}
+              <UserButton
+                appearance={{ elements: { avatarBox: 'w-8 h-8' } }}
                 afterSignOutUrl="/"
               />
             </SignedIn>
-            
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="rounded-full w-10 h-10 hover:bg-white/10"
+
+            {/* Mobile toggle */}
+            <button
+              className="md:hidden btn-ghost"
+              style={{ padding: '0.4rem' }}
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Toggle menu"
             >
-              {theme === 'dark' ? (
-                <Sun className="h-5 w-5 text-yellow-400" />
-              ) : (
-                <Moon className="h-5 w-5 text-slate-700" />
-              )}
-            </Button>
+              {mobileOpen
+                ? <IconX style={{ width: '20px', height: '20px' }} />
+                : <IconMenu2 style={{ width: '20px', height: '20px' }} />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile drawer */}
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.18 }}
+              style={{
+                background: 'var(--bg-surface)',
+                borderBottom: '1px solid var(--border)',
+                padding: '1rem 1.5rem',
+              }}
+            >
+              {navItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setMobileOpen(false)}
+                    className={`nav-link${isActive ? ' active' : ''}`}
+                    style={{ display: 'flex', padding: '0.65rem 0.85rem', marginBottom: '0.25rem' }}
+                  >
+                    <item.icon style={{ width: '16px', height: '16px' }} />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+              <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
+                <SignedOut>
+                  <Link
+                    to="/signin"
+                    onClick={() => setMobileOpen(false)}
+                    className="btn-secondary"
+                    style={{ flex: 1, justifyContent: 'center' }}
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    to="/signup"
+                    onClick={() => setMobileOpen(false)}
+                    className="btn-primary"
+                    style={{ flex: 1, justifyContent: 'center' }}
+                  >
+                    Get started
+                  </Link>
+                </SignedOut>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
-      {/* Main Content - Remove container padding for full-width landing */}
+      {/* ── PAGES ── */}
       <main>
         <AnimatePresence mode="wait">
           <Routes location={location} key={location.pathname}>
-            <Route
-              path="/"
-              element={
-                <motion.div
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
-                  <LandingPage />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <motion.div
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
-                  <Dashboard />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/models"
-              element={
-                <motion.div
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
-                  <ModelInsights />
-                </motion.div>
-              }
-            />
-            {/* <Route
-              path="/analytics"
-              element={
-                <motion.div
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
-                  <Analytics />
-                </motion.div>
-              }
-            /> */}
-            <Route
-              path="/backtest"
-              element={
-                <motion.div
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
-                  <BacktestPage />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <motion.div
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
-                  <SettingsPage />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/solutions"
-              element={
-                <motion.div
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
-                  <Solutions />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/technology"
-              element={
-                <motion.div
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
-                  <Technology />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/about"
-              element={
-                <motion.div
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
-                  <About />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/contact"
-              element={
-                <motion.div
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
-                  <Contact />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/signup"
-              element={
-                <motion.div
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
-                  <Signup />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/signin"
-              element={
-                <motion.div
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
-                  <Signin />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/privacy"
-              element={
-                <motion.div
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
-                  <Privacy />
-                </motion.div>
-              }
-            />
-            <Route
-              path="/terms"
-              element={
-                <motion.div
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
-                  <Terms />
-                </motion.div>
-              }
-            />
-            {/* <Route
-              path="/dashboard/analytics"
-              element={
-                <motion.div
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
-                  <Analytics />
-                </motion.div>
-              }
-            /> */}
-            <Route
-              path="/disclaimer"
-              element={
-                <motion.div
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                >
-                  <Disclaimer />
-                </motion.div>
-              }
-            />
+            {/* Public */}
+            <Route path="/"           element={<Wrap><LandingPage /></Wrap>} />
+            <Route path="/solutions"  element={<Wrap><Solutions /></Wrap>} />
+            <Route path="/technology" element={<Wrap><Technology /></Wrap>} />
+            <Route path="/about"      element={<Wrap><About /></Wrap>} />
+            <Route path="/contact"    element={<Wrap><Contact /></Wrap>} />
+            <Route path="/privacy"    element={<Wrap><Privacy /></Wrap>} />
+            <Route path="/terms"      element={<Wrap><Terms /></Wrap>} />
+            <Route path="/disclaimer" element={<Wrap><Disclaimer /></Wrap>} />
+
+            {/* Auth */}
+            <Route path="/signup"  element={<Wrap><Signup /></Wrap>} />
+            <Route path="/signin"  element={<Wrap><Signin /></Wrap>} />
+
+            {/* App — open access (no auth gate) */}
+            <Route path="/dashboard" element={<Wrap><Dashboard /></Wrap>} />
+            <Route path="/models"    element={<Wrap><ModelInsights /></Wrap>} />
+            <Route path="/backtest"  element={<Wrap><BacktestPage /></Wrap>} />
+            <Route path="/settings"  element={<Wrap><SettingsPage /></Wrap>} />
           </Routes>
         </AnimatePresence>
       </main>
     </div>
+  );
+}
+
+function Wrap({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div
+      variants={pageVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      transition={{ duration: 0.22, ease: 'easeOut' }}
+    >
+      {children}
+    </motion.div>
   );
 }
 

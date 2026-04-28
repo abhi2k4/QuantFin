@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, AlertTriangle } from 'lucide-react';
+import { IconArrowLeft, IconAlertTriangle } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
@@ -19,13 +19,13 @@ export default function Disclaimer() {
       <div className="container mx-auto px-6 py-24 max-w-4xl">
         <Link to="/">
           <Button className="btn-secondary mb-8 rounded-xl">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <IconArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
         </Link>
         
         <div className="flex items-center gap-3 mb-6">
-          <AlertTriangle className="w-10 h-10 text-yellow-400" />
+          <IconAlertTriangle className="w-10 h-10 text-yellow-400" />
           <h1 className="text-5xl font-bold gradient-text">Disclaimer</h1>
         </div>
         <p className="text-sm text-gray-500 mb-12">Last updated: October 10, 2025</p>

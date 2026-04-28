@@ -176,6 +176,11 @@ export default {
   				'ui-sans-serif',
   				'system-ui'
   			],
+  			grotesk: [
+  				'Space Grotesk',
+  				'ui-sans-serif',
+  				'system-ui'
+  			],
   			mono: [
   				'JetBrains Mono',
   				'ui-monospace',

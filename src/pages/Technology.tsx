@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Code2, Database, Cpu, Layers, Zap, Shield, GitBranch, ArrowRight } from 'lucide-react';
+import { IconArrowLeft, IconCode, IconDatabase, IconCpu, IconLayersLinked, IconBolt, IconShield, IconGitBranch, IconArrowRight } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
@@ -24,7 +24,7 @@ export default function Technology() {
       <div className="container mx-auto px-6 py-24">
         <Link to="/">
           <Button className="btn-secondary mb-8 rounded-xl">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <IconArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
         </Link>
@@ -47,7 +47,7 @@ export default function Technology() {
             <motion.div variants={fadeInUp} className="card">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center">
-                  <Database className="w-6 h-6 text-blue-400" />
+                  <IconDatabase className="w-6 h-6 text-blue-400" />
                 </div>
                 <h2 className="text-2xl font-bold text-white">Backend Infrastructure</h2>
               </div>
@@ -71,7 +71,7 @@ export default function Technology() {
             <motion.div variants={fadeInUp} className="card">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                  <Code2 className="w-6 h-6 text-purple-400" />
+                  <IconCode className="w-6 h-6 text-purple-400" />
                 </div>
                 <h2 className="text-2xl font-bold text-white">Frontend Experience</h2>
               </div>
@@ -98,7 +98,7 @@ export default function Technology() {
           <motion.div variants={fadeInUp} className="card mb-16 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-500/20">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center">
-                <Cpu className="w-7 h-7 text-emerald-400" />
+                <IconCpu className="w-7 h-7 text-emerald-400" />
               </div>
               <h2 className="text-3xl font-bold text-white">Machine Learning Models</h2>
             </div>
@@ -126,9 +126,9 @@ export default function Technology() {
           {/* Features Grid */}
           <motion.div variants={staggerContainer} className="grid md:grid-cols-3 gap-6 mb-16">
             {[
-              { icon: Zap, title: 'Real-time Processing', desc: '73 engineered features calculated in milliseconds for instant insights' },
-              { icon: Shield, title: 'Secure & Reliable', desc: 'Enterprise-grade security with encrypted data storage and transmission' },
-              { icon: GitBranch, title: 'CI/CD Pipeline', desc: 'Automated testing and deployment for continuous improvements' }
+              { icon: IconBolt, title: 'Real-time Processing', desc: '73 engineered features calculated in milliseconds for instant insights' },
+              { icon: IconShield, title: 'Secure & Reliable', desc: 'Enterprise-grade security with encrypted data storage and transmission' },
+              { icon: IconGitBranch, title: 'CI/CD Pipeline', desc: 'Automated testing and deployment for continuous improvements' }
             ].map((feature, i) => (
               <motion.div key={i} variants={fadeInUp} className="stat-card text-center">
                 <feature.icon className="w-10 h-10 text-blue-400 mx-auto mb-4" />
@@ -150,7 +150,7 @@ export default function Technology() {
               ].map((section, i) => (
                 <div key={i} className="p-5 bg-white/5 rounded-xl">
                   <h3 className="font-bold text-white mb-4 flex items-center gap-2">
-                    <Layers className="w-5 h-5 text-blue-400" />
+                    <IconLayersLinked className="w-5 h-5 text-blue-400" />
                     {section.title}
                   </h3>
                   <ul className="space-y-2">
@@ -171,7 +171,7 @@ export default function Technology() {
             <Link to="/dashboard">
               <Button className="btn-primary text-lg px-10 py-4 h-auto rounded-xl group">
                 See It In Action
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                <IconArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
             <p className="text-gray-500 text-sm mt-4">Explore our demo dashboard with real data</p>

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Mail, MapPin, Phone } from 'lucide-react';
+import { IconArrowLeft, IconMail, IconMapPin, IconPhone } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
@@ -19,7 +19,7 @@ export default function Contact() {
       <div className="container mx-auto px-6 py-24">
         <Link to="/">
           <Button className="btn-secondary mb-8 rounded-xl">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <IconArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
         </Link>
@@ -31,19 +31,19 @@ export default function Contact() {
         
         <div className="grid md:grid-cols-3 gap-6 max-w-4xl">
           <div className="card text-center">
-            <Mail className="w-8 h-8 text-blue-400 mx-auto mb-4" />
+            <IconMail className="w-8 h-8 text-blue-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-white mb-2">Email</h3>
             <p className="text-gray-400 text-sm">contact@quantfin.ai</p>
           </div>
           
           <div className="card text-center">
-            <Phone className="w-8 h-8 text-purple-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-white mb-2">Phone</h3>
+            <IconPhone className="w-8 h-8 text-purple-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-white mb-2">IconPhone</h3>
             <p className="text-gray-400 text-sm">+91 XXXX-XXXXXX</p>
           </div>
           
           <div className="card text-center">
-            <MapPin className="w-8 h-8 text-emerald-400 mx-auto mb-4" />
+            <IconMapPin className="w-8 h-8 text-emerald-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-white mb-2">Location</h3>
             <p className="text-gray-400 text-sm">Mumbai, India</p>
           </div>

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, TrendingUp, Brain, Target, BarChart3, Zap, Shield, CheckCircle2, ArrowRight } from 'lucide-react';
+import { IconArrowLeft, IconTrendingUp, IconBrain, IconTarget, IconChartBar, IconBolt, IconShield, IconCircleCheck, IconArrowRight } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
@@ -24,7 +24,7 @@ export default function Solutions() {
       <div className="container mx-auto px-6 py-24">
         <Link to="/">
           <Button className="btn-secondary mb-8 rounded-xl">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <IconArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
         </Link>
@@ -46,28 +46,28 @@ export default function Solutions() {
             {[
               {
                 step: '01',
-                icon: Target,
+                icon: IconTarget,
                 title: 'Connect Your Portfolio',
                 desc: 'Simply connect your portfolio or upload historical trading data from the Indian stock market. Our system securely analyzes your Nifty 50 holdings and trading patterns.',
                 features: ['Secure data import', 'Nifty 50 stock support', 'Historical data analysis', 'Real-time market sync']
               },
               {
                 step: '02',
-                icon: Brain,
+                icon: IconBrain,
                 title: 'AI Analysis & Prediction',
                 desc: 'Our ensemble of 4 ML models (LSTM Neural Network, Linear Regression, Logistic Regression, and SVM) process technical indicators including RSI, MACD, and Bollinger Bands to predict market movements.',
                 features: ['4 ML models in ensemble', 'Real-time predictions', 'Technical indicator analysis', 'Pattern recognition with TensorFlow']
               },
               {
                 step: '03',
-                icon: BarChart3,
+                icon: IconChartBar,
                 title: 'Portfolio Optimization',
                 desc: 'Get AI-powered recommendations for optimal asset allocation. Our algorithms balance risk and return using Modern Portfolio Theory and risk-adjusted metrics.',
                 features: ['Sharpe ratio optimization', 'Risk-return analysis', 'Automated rebalancing', 'Diversification insights']
               },
               {
                 step: '04',
-                icon: Zap,
+                icon: IconBolt,
                 title: 'Execute & Monitor',
                 desc: 'View actionable insights on your dashboard with real-time updates. Track performance, monitor risk metrics, and receive alerts for portfolio rebalancing opportunities.',
                 features: ['Live dashboard', 'Performance tracking', 'Risk alerts', 'Backtesting results']
@@ -91,7 +91,7 @@ export default function Solutions() {
                     <div className="grid sm:grid-cols-2 gap-3">
                       {item.features.map((feature, j) => (
                         <div key={j} className="flex items-center gap-2">
-                          <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                          <IconCircleCheck className="w-5 h-5 text-emerald-400 flex-shrink-0" />
                           <span className="text-gray-300 text-sm">{feature}</span>
                         </div>
                       ))}
@@ -107,9 +107,9 @@ export default function Solutions() {
             <h2 className="text-3xl font-bold text-white mb-8 text-center">Why Choose QuantFin AI?</h2>
             <div className="grid md:grid-cols-3 gap-6">
               {[
-                { icon: Shield, title: 'Risk Management', desc: 'Comprehensive risk metrics including volatility, max drawdown, and Value at Risk (VaR)' },
-                { icon: TrendingUp, title: 'Proven Results', desc: 'Backtested strategies on historical data with transparent performance metrics' },
-                { icon: Zap, title: 'Real-time Updates', desc: 'Live market data integration with instant portfolio recalculations' }
+                { icon: IconShield, title: 'Risk Management', desc: 'Comprehensive risk metrics including volatility, max drawdown, and Value at Risk (VaR)' },
+                { icon: IconTrendingUp, title: 'Proven Results', desc: 'Backtested strategies on historical data with transparent performance metrics' },
+                { icon: IconBolt, title: 'Real-time Updates', desc: 'Live market data integration with instant portfolio recalculations' }
               ].map((benefit, i) => (
                 <div key={i} className="text-center">
                   <benefit.icon className="w-12 h-12 text-blue-400 mx-auto mb-4" />
@@ -125,7 +125,7 @@ export default function Solutions() {
             <Link to="/dashboard">
               <Button className="btn-primary text-lg px-10 py-4 h-auto rounded-xl group">
                 Try QuantFin Now
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                <IconArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
             <p className="text-gray-500 text-sm mt-4">No credit card required • Free demo access</p>

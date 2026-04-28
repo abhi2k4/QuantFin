@@ -287,6 +287,20 @@ class RealDataService:
         """
         df = self.load_stock_data(symbol)
         
+        # Get the maximum available date in the dataset
+        max_data_date = df['Date'].max()
+        
+        # Clamp dates to available data range
+        if start_date and end_date:
+            # If both dates are beyond available data, adjust backward
+            if start_date > max_data_date:
+                start_date = max_data_date - timedelta(days=90)
+            # If end_date is beyond available data, cap it
+            if end_date > max_data_date:
+                end_date = max_data_date
+        elif end_date and end_date > max_data_date:
+            end_date = max_data_date
+        
         # Apply date filters
         if start_date:
             df = df[df['Date'] >= start_date]

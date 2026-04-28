@@ -341,8 +341,8 @@ class PortfolioAllocator:
                     'buy_price': round(stock['current_price'], 2),
                     'predicted_price': round(stock['predicted_price'], 2),
                     'predicted_return': round(stock['predicted_return'], 2),
-                    'confidence': round(stock['confidence'], 2),
                     'volatility': round(float(stock.get('volatility', 15.0)), 2),
+                    'confidence': round(stock['confidence'], 2),
                     'action': 'BUY'
                 })
         

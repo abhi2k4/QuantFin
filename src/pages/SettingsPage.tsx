@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Bell, Shield, Database, Zap } from 'lucide-react';
+import { IconBell, IconShield, IconDatabase, IconBolt } from '@tabler/icons-react';
 
 export default function SettingsPage() {
   return (
@@ -33,7 +33,7 @@ export default function SettingsPage() {
                 {/* Notifications */}
                 <div>
                   <div className="flex items-center gap-3 mb-4">
-                    <Bell className="w-5 h-5 text-cyan-400" />
+                    <IconBell className="w-5 h-5 text-cyan-400" />
                     <h3 className="font-semibold">Notifications</h3>
                   </div>
                   <div className="space-y-3">
@@ -58,7 +58,7 @@ export default function SettingsPage() {
                 {/* Security */}
                 <div>
                   <div className="flex items-center gap-3 mb-4">
-                    <Shield className="w-5 h-5 text-emerald-400" />
+                    <IconShield className="w-5 h-5 text-emerald-400" />
                     <h3 className="font-semibold">Security</h3>
                   </div>
                   <div className="space-y-3">
@@ -76,7 +76,7 @@ export default function SettingsPage() {
                 {/* Data & Performance */}
                 <div>
                   <div className="flex items-center gap-3 mb-4">
-                    <Database className="w-5 h-5 text-amber-400" />
+                    <IconDatabase className="w-5 h-5 text-amber-400" />
                     <h3 className="font-semibold">Data & Performance</h3>
                   </div>
                   <div className="flex items-center justify-between py-2">
@@ -85,7 +85,7 @@ export default function SettingsPage() {
                       <p className="text-sm text-gray-400">Use GPU for faster model training</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Zap className="w-4 h-4 text-yellow-400" />
+                      <IconBolt className="w-4 h-4 text-yellow-400" />
                       <Switch />
                     </div>
                   </div>

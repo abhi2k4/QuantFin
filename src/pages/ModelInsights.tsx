@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Brain, Activity, TrendingUp, Loader2, RefreshCw, Zap, CheckCircle, XCircle } from 'lucide-react';
+import { IconBrain, IconActivity, IconTrendingUp, IconLoader, IconRefresh, IconBolt, IconCircleCheck, IconCircleX } from '@tabler/icons-react';
 import { getModelPerformance, getTrainingStatus, trainModels, getErrorMessage, type ModelPerformance } from '@/services/api';
 import { toast } from 'sonner';
 
@@ -68,17 +68,17 @@ export default function ModelInsights() {
   };
 
   const getModelIcon = (model: string) => {
-    if (model.includes('LSTM')) return Brain;
-    if (model.includes('ARIMA')) return Activity;
-    return TrendingUp;
+    if (model.includes('LSTM')) return IconBrain;
+    if (model.includes('ARIMA')) return IconActivity;
+    return IconTrendingUp;
   };
 
   const getModelColor = (model: string) => {
     const colors: Record<string, string> = {
       'LSTM': 'text-blue-400',
       'Linear Regression': 'text-green-400',
-      'SVM': 'text-purple-400',
-      'ARIMA': 'text-orange-400'
+      'SVM': 'text-[#a0a0a0]',
+      'ARIMA': 'text-[#f97316]'
     };
     return colors[model] || 'text-cyan-400';
   };
@@ -94,14 +94,14 @@ export default function ModelInsights() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white">
+      <div className="min-h-screen bg-[#0d0d0d] text-white">
         {/* Top Bar */}
-        <div className="sticky top-0 z-50 backdrop-blur-xl bg-zinc-950/80 border-b border-white/5">
+        <div className="border-b border-[rgba(255,255,255,0.06)] bg-[rgba(13,13,13,0.9)] backdrop-blur-xl">
           <div className="max-w-[1600px] mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold flex items-center gap-3">
-                  <Brain className="w-6 h-6 text-blue-400" />
+                  <IconBrain className="w-6 h-6 text-[#c8ff00]" />
                   Model Insights
                 </h1>
                 <p className="text-sm text-gray-400 mt-1">AI model performance and training status</p>
@@ -110,16 +110,16 @@ export default function ModelInsights() {
                 <Button
                   onClick={handleTrainModels}
                   disabled={training || loading}
-                  className="rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
+                  className="rounded-xl bg-[#c8ff00] text-black hover:bg-[#d8ff33] border-0"
                 >
                   {training ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      <IconLoader className="w-4 h-4 mr-2 animate-spin" />
                       Training...
                     </>
                   ) : (
                     <>
-                      <Zap className="w-4 h-4 mr-2" />
+                      <IconBolt className="w-4 h-4 mr-2" />
                       Train Models
                     </>
                   )}
@@ -127,9 +127,9 @@ export default function ModelInsights() {
                 <Button
                   onClick={() => loadModels()}
                   disabled={loading || training}
-                  className="rounded-xl bg-white/5 hover:bg-white/10 border border-white/10"
+                  className="rounded-xl bg-[#1a1a1a] hover:bg-[#222] border border-[rgba(255,255,255,0.07)]"
                 >
-                  <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                  <IconRefresh className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                   Refresh
                 </Button>
               </div>
@@ -145,7 +145,7 @@ export default function ModelInsights() {
               animate={{ opacity: 1 }}
               className="flex flex-col items-center justify-center py-20"
             >
-              <Loader2 className="w-12 h-12 text-blue-400 animate-spin mb-4" />
+              <IconLoader className="w-12 h-12 text-[#c8ff00] animate-spin mb-4" />
               <p className="text-gray-400">Loading model performance data...</p>
             </motion.div>
           ) : (
@@ -168,12 +168,12 @@ export default function ModelInsights() {
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: i * 0.1 + 0.2 }}
                     >
-                      <Card className={`relative p-6 bg-white/5 backdrop-blur-xl border-white/10 hover:border-white/20 transition-all ${
-                        isBest ? 'ring-2 ring-yellow-500/50' : ''
+                      <Card className={`relative p-6 bg-[#141414] border-[rgba(255,255,255,0.07)] hover:border-white/20 transition-all ${
+                        isBest ? 'ring-1 ring-[#c8ff00]/30' : ''
                       }`}>
                         {isBest && (
                           <div className="absolute top-2 right-2">
-                            <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded-full font-semibold">
+                            <span className="text-xs bg-yellow-500/20 text-[#eab308] px-2 py-1 rounded-full font-semibold">
                               Best
                             </span>
                           </div>
@@ -205,13 +205,13 @@ export default function ModelInsights() {
                             <div className="flex items-center gap-2">
                               {model.status === 'trained' ? (
                                 <>
-                                  <CheckCircle className="w-4 h-4 text-green-400" />
+                                  <IconCircleCheck className="w-4 h-4 text-green-400" />
                                   <span className="text-xs text-green-400">Trained</span>
                                 </>
                               ) : (
                                 <>
-                                  <XCircle className="w-4 h-4 text-yellow-400" />
-                                  <span className="text-xs text-yellow-400">Needs Training</span>
+                                  <IconCircleX className="w-4 h-4 text-[#eab308]" />
+                                  <span className="text-xs text-[#eab308]">Needs Training</span>
                                 </>
                               )}
                             </div>
@@ -229,7 +229,7 @@ export default function ModelInsights() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                <Card className="bg-white/5 backdrop-blur-xl border-white/10 p-6">
+                <Card className="bg-[#141414] border-[rgba(255,255,255,0.07)] p-6">
                   <h3 className="text-lg font-semibold mb-4">Detailed Model Comparison</h3>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
@@ -250,14 +250,14 @@ export default function ModelInsights() {
                           return (
                             <tr
                               key={model.model}
-                              className={`border-b border-white/5 hover:bg-white/5 transition-colors ${
+                              className={`border-b border-white/5 hover:bg-[rgba(200,255,0,0.03)] transition-colors ${
                                 isBest ? 'bg-yellow-500/5' : ''
                               }`}
                             >
                               <td className="py-3 px-4 font-medium">
                                 {model.model}
                                 {isBest && (
-                                  <span className="ml-2 text-xs text-yellow-400">★</span>
+                                  <span className="ml-2 text-xs text-[#eab308]">★</span>
                                 )}
                               </td>
                               <td className="py-3 px-4 text-right font-mono text-green-400">
@@ -272,7 +272,7 @@ export default function ModelInsights() {
                               <td className="py-3 px-4 text-right font-mono text-gray-400">
                                 {model.rmse.toFixed(2)}
                               </td>
-                              <td className="py-3 px-4 text-right font-mono text-purple-400">
+                              <td className="py-3 px-4 text-right font-mono text-[#a0a0a0]">
                                 {model.r2_score.toFixed(3)}
                               </td>
                               <td className="py-3 px-4 text-right text-gray-400">
@@ -293,12 +293,12 @@ export default function ModelInsights() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
               >
-                <Card className="bg-blue-500/10 border-blue-500/20 p-4">
+                <Card className="bg-[rgba(200,255,0,0.04)] border-[rgba(200,255,0,0.15)] p-4">
                   <div className="flex items-start gap-3">
-                    <Brain className="w-5 h-5 text-blue-400 mt-0.5" />
+                    <IconBrain className="w-5 h-5 text-blue-400 mt-0.5" />
                     <div className="flex-1">
-                      <h4 className="font-semibold text-blue-300 mb-1">Model Training Information</h4>
-                      <p className="text-sm text-blue-200/80">
+                      <h4 className="font-semibold text-[#c8ff00] mb-1">Model Training Information</h4>
+                      <p className="text-sm text-[rgba(200,255,0,0.7)]">
                         All models are trained on historical stock data. Click "Train Models" to retrain with the latest data. 
                         Training typically takes 30-60 seconds. The best performing model is highlighted with a ★ marker.
                       </p>

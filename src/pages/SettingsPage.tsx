@@ -8,9 +8,9 @@ import { IconBell, IconShield, IconDatabase, IconBolt } from '@tabler/icons-reac
 export default function SettingsPage() {
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white">
+      <div className="min-h-screen bg-[#0d0d0d] text-white">
         {/* Top Bar */}
-        <div className="sticky top-0 z-50 backdrop-blur-xl bg-zinc-950/80 border-b border-white/5">
+        <div className="border-b border-[rgba(255,255,255,0.06)] bg-[rgba(13,13,13,0.9)] backdrop-blur-xl">
           <div className="max-w-[1600px] mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
               <div>
@@ -28,7 +28,7 @@ export default function SettingsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <Card className="p-6 bg-white/5 backdrop-blur-xl border-white/10">
+            <Card className="p-6 bg-[#141414] border border-[rgba(255,255,255,0.07)]">
               <div className="space-y-6">
                 {/* Notifications */}
                 <div>

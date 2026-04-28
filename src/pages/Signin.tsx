@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, TrendingUp } from 'lucide-react';
+import type { Variants } from 'framer-motion';
+import { IconTrendingUp, IconArrowLeft } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import { SignIn } from '@/lib/clerk';
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
 };
@@ -41,7 +42,7 @@ export default function Signin() {
 
         <div>
           <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '3rem' }}>
-            <TrendingUp style={{ width: '20px', height: '20px', color: '#c8ff00' }} />
+            <IconTrendingUp style={{ width: '20px', height: '20px', color: '#c8ff00' }} />
             <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '1rem' }}>
               QuantFin<span style={{ color: '#c8ff00' }}>AI</span>
             </span>
@@ -93,7 +94,7 @@ export default function Signin() {
             onMouseOver={e => (e.currentTarget.style.color = '#c8ff00')}
             onMouseOut={e => (e.currentTarget.style.color = 'var(--text-muted)')}
           >
-            <ArrowLeft style={{ width: '14px', height: '14px' }} />
+            <IconArrowLeft style={{ width: '14px', height: '14px' }} />
             Back to home
           </Link>
 

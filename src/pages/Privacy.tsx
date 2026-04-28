@@ -24,7 +24,7 @@ export default function Privacy() {
           </Button>
         </Link>
         
-        <h1 className="text-5xl font-bold gradient-text mb-6">Privacy Policy</h1>
+        <h1 className="text-5xl font-bold text-white mb-6">Privacy Policy</h1>
         <p className="text-sm text-gray-500 mb-12">Last updated: October 10, 2025</p>
         
         <div className="card space-y-6">

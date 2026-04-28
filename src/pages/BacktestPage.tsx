@@ -75,7 +75,7 @@ export default function BacktestPage() {
   })) : [];
 
   return (
-    <div className="min-h-screen bg-bg-[#0d0d0d] text-white">
+    <div className="min-h-screen bg-[#0d0d0d] text-white">
       {/* Header Section */}
       <div className="border-b border-[rgba(255,255,255,0.06)] bg-[rgba(13,13,13,0.9)] backdrop-blur-xl">
         <div className="max-w-[1600px] mx-auto px-6 py-6">

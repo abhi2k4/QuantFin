@@ -3,6 +3,13 @@
 
 import axios, { AxiosInstance, AxiosError } from 'axios';
 
+/** Returns true for requests that were intentionally aborted (cleanup on unmount / timeframe change). */
+const isCanceledError = (error: unknown): boolean => {
+  if (axios.isCancel(error)) return true;
+  const e = error as { code?: string; name?: string };
+  return e?.code === 'ERR_CANCELED' || e?.name === 'CanceledError';
+};
+
 // ==================== CONFIGURATION ====================
 
 // Base API URL - Update this to your backend URL
@@ -257,22 +264,6 @@ export interface BacktestMetrics {
   num_trades: number;
 }
 
-export interface BacktestResponse {
-  configuration: {
-    symbols: string[];
-    strategy: string;
-    start_date: string;
-    end_date: string;
-    initial_capital: number;
-    rebalance_freq: number;
-  };
-  daily_results: DailyResult[];
-  cumulative_returns: number[];
-  drawdowns: number[];
-  metrics: BacktestMetrics;
-  warnings: string[];
-}
-
 // Old backtest request (keeping for backward compatibility)
 export interface OldBacktestRequest {
   symbols: string[];
@@ -298,7 +289,7 @@ export const getPortfolioSummary = async (signal?: AbortSignal): Promise<Portfol
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching portfolio summary:', error);
+    if (!isCanceledError(error)) console.error('Error fetching portfolio summary:', error);
     throw error;
   }
 };
@@ -319,7 +310,7 @@ export const getPortfolioPerformance = async (
     });
     return response.data;
   } catch (error) {
-    console.error('Error fetching portfolio performance:', error);
+    if (!isCanceledError(error)) console.error('Error fetching portfolio performance:', error);
     throw error;
   }
 };
@@ -339,7 +330,7 @@ export const rebalancePortfolio = async (
     });
     return response.data;
   } catch (error) {
-    console.error('Error rebalancing portfolio:', error);
+    if (!isCanceledError(error)) console.error('Error rebalancing portfolio:', error);
     throw error;
   }
 };
@@ -361,7 +352,7 @@ export const getStrategyComparison = async (
     });
     return response.data;
   } catch (error) {
-    console.error('Error rebalancing portfolio:', error);
+    if (!isCanceledError(error)) console.error('Error fetching strategy comparison:', error);
     throw error;
   }
 };

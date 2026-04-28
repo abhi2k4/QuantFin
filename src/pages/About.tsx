@@ -24,7 +24,7 @@ export default function About() {
           </Button>
         </Link>
         
-        <h1 className="text-5xl font-bold gradient-text mb-6">About Us</h1>
+        <h1 className="text-5xl font-bold text-white mb-6">About Us</h1>
         <p className="text-xl text-gray-400 max-w-3xl">
           Learn more about QuantFin AI, our mission, and the team behind the platform.
         </p>

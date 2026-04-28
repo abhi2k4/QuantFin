@@ -9,7 +9,7 @@ import './index.css';
 // Import your Clerk Publishable Key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
-if (!PUBLISHABLE_KEY) {
+if (!PUBLISHABLE_KEY && import.meta.env.VITE_SKIP_CLERK_AUTH !== 'true') {
   // Clerk is optional in development. When no publishable key is provided we run in "skip auth" mode.
   console.warn('VITE_CLERK_PUBLISHABLE_KEY not set — running without Clerk (dev skip auth)');
 }

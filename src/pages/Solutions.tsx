@@ -34,7 +34,7 @@ export default function Solutions() {
           animate="visible"
           variants={staggerContainer}
         >
-          <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl font-bold gradient-text mb-6">
+          <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl font-bold text-white mb-6">
             How QuantFin AI Works
           </motion.h1>
           <motion.p variants={fadeInUp} className="text-xl text-gray-400 max-w-3xl mb-16">
@@ -82,7 +82,7 @@ export default function Solutions() {
                   {item.step}
                 </div>
                 <div className="relative z-10 grid md:grid-cols-[auto,1fr] gap-6 items-start">
-                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-white/10">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-slate-800 border border-slate-700">
                     <item.icon className="w-10 h-10 text-blue-400" />
                   </div>
                   <div>
@@ -103,7 +103,7 @@ export default function Solutions() {
           </motion.div>
 
           {/* Key Benefits */}
-          <motion.div variants={fadeInUp} className="card-flat bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/20">
+          <motion.div variants={fadeInUp} className="card-flat bg-slate-900 border-slate-800">
             <h2 className="text-3xl font-bold text-white mb-8 text-center">Why Choose QuantFin AI?</h2>
             <div className="grid md:grid-cols-3 gap-6">
               {[

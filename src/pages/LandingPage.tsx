@@ -1,14 +1,15 @@
 import { motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import { IconTrendingUp, IconRobot, IconShield, IconBolt, IconArrowRight, IconChartBar, IconBrain, IconTarget, IconUsers, IconBriefcase, IconUserCheck, IconBrandGithub, IconBrandTwitter, IconBrandLinkedin, IconActivity } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden:  { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
 };
 
-const stagger = {
-  hidden:  {},
+const stagger: Variants = {
+  hidden:  { transition: { staggerChildren: 0, delayChildren: 0 } },
   visible: { transition: { staggerChildren: 0.12 } },
 };
 
@@ -55,7 +56,7 @@ export default function LandingPage() {
               style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', marginBottom: '1.25rem', color: 'var(--text-primary)' }}
             >
               Smarter investing,<br />
-              <span className="gradient-text">powered by AI</span>
+              <span style={{ color: '#c8ff00', fontWeight: 700 }}>powered by AI</span>
             </motion.h1>
 
             <motion.p

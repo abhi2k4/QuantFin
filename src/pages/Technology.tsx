@@ -34,7 +34,7 @@ export default function Technology() {
           animate="visible"
           variants={staggerContainer}
         >
-          <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl font-bold gradient-text mb-6">
+          <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl font-bold text-white mb-6">
             Our Technology Stack
           </motion.h1>
           <motion.p variants={fadeInUp} className="text-xl text-gray-400 max-w-3xl mb-16">
@@ -46,7 +46,7 @@ export default function Technology() {
             {/* Backend */}
             <motion.div variants={fadeInUp} className="card">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-blue-950 flex items-center justify-center border border-blue-800">
                   <IconDatabase className="w-6 h-6 text-blue-400" />
                 </div>
                 <h2 className="text-2xl font-bold text-white">Backend Infrastructure</h2>
@@ -70,7 +70,7 @@ export default function Technology() {
             {/* Frontend */}
             <motion.div variants={fadeInUp} className="card">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-purple-950 flex items-center justify-center border border-purple-800">
                   <IconCode className="w-6 h-6 text-purple-400" />
                 </div>
                 <h2 className="text-2xl font-bold text-white">Frontend Experience</h2>
@@ -95,9 +95,9 @@ export default function Technology() {
           </motion.div>
 
           {/* ML Models Section */}
-          <motion.div variants={fadeInUp} className="card mb-16 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border-emerald-500/20">
+          <motion.div variants={fadeInUp} className="card mb-16 bg-emerald-950/30 border-emerald-800">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-950 flex items-center justify-center border border-emerald-800">
                 <IconCpu className="w-7 h-7 text-emerald-400" />
               </div>
               <h2 className="text-3xl font-bold text-white">Machine Learning Models</h2>

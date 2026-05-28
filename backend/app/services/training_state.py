@@ -5,12 +5,26 @@ outside the API worker process.
 """
 
 import json
+import os
 import tempfile
 from pathlib import Path
 from typing import Any, Dict
 
 
-STATE_PATH = Path(tempfile.gettempdir()) / "quantfin_training_state.json"
+def _get_state_path() -> Path:
+    """
+    Use /home on Azure App Service (persistent across restarts),
+    fall back to /tmp for local development.
+    """
+    azure_home = Path("/home")
+    if azure_home.exists() and os.access(azure_home, os.W_OK):
+        state_dir = azure_home / "quantfin"
+        state_dir.mkdir(parents=True, exist_ok=True)
+        return state_dir / "training_state.json"
+    return Path(tempfile.gettempdir()) / "quantfin_training_state.json"
+
+
+STATE_PATH = _get_state_path()
 
 
 def load_training_state() -> Dict[str, Any]:

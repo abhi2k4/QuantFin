@@ -8,12 +8,11 @@ Author: QuantFin Team
 Date: 2025-10-30
 """
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, BackgroundTasks
 from typing import List, Dict, Any
 from pathlib import Path
 import logging
 import asyncio
-import multiprocessing
 
 from app.services.ml_training_service import get_training_service
 from app.services.real_data_service import RealDataService
@@ -29,61 +28,24 @@ router = APIRouter(prefix="/api/analytics", tags=["analytics"])
 training_service = get_training_service()
 
 
-def run_training_sync(force: bool):
-    """Synchronous wrapper to run async training in a worker process."""
-    import sys
-    
+async def run_training_background(force: bool):
+    """Async background task to run model training without blocking the API."""
+    logger.info(f"🚀 Background training started (force={force})")
     try:
-        # Print to console immediately (bypasses logging buffer)
-        print("\n" + "=" * 80, flush=True)
-        print(f"🚀 STARTING MODEL TRAINING (force={force})", flush=True)
-        print("=" * 80 + "\n", flush=True)
-        
-        logger.info("=" * 80)
-        logger.info(f"🚀 STARTING MODEL TRAINING (force={force})")
-        logger.info("=" * 80)
-        
-        # Run async function in event loop
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        
-        print("📊 Training service initialized", flush=True)
-        print(f"🔄 Force retrain: {force}", flush=True)
-        print("⏳ This will take 30-60 seconds...", flush=True)
-        print("", flush=True)
-        
-        logger.info("📊 Training service initialized")
-        logger.info(f"🔄 Force retrain: {force}")
-        logger.info("⏳ This will take 30-60 seconds...")
-        logger.info("")
-        
-        result = loop.run_until_complete(training_service.train_all_models(force))
-        loop.close()
-        
-        print("", flush=True)
-        print("=" * 80, flush=True)
-        print("✅ MODEL TRAINING COMPLETED SUCCESSFULLY", flush=True)
-        print("=" * 80 + "\n", flush=True)
-        
-        logger.info("")
-        logger.info("=" * 80)
-        logger.info("✅ MODEL TRAINING COMPLETED SUCCESSFULLY")
-        logger.info("=" * 80)
-        
+        result = await training_service.train_all_models(force)
+        logger.info("✅ Background training completed successfully")
         return result
     except Exception as e:
-        error_msg = f"❌ TRAINING FAILED: {e}"
-        print("\n" + "=" * 80, flush=True)
-        print(error_msg, flush=True)
-        print("=" * 80 + "\n", flush=True)
-        
-        logger.error("=" * 80)
-        logger.error(error_msg)
-        logger.error("=" * 80)
-        logger.error("Full error:", exc_info=True)
-        training_service.training_status['status'] = 'failed'
-        training_service.training_status['error'] = str(e)
-        raise
+        logger.error(f"❌ Background training failed: {e}", exc_info=True)
+        save_training_state({
+            "status": "failed",
+            "progress": 0,
+            "current_model": None,
+            "models_completed": [],
+            "error": str(e),
+            "started_at": None,
+            "completed_at": None,
+        })
 
 
 @router.post("/models/train")
@@ -123,16 +85,17 @@ async def train_models(
             "completed_at": None,
         })
 
-        # Start training in a separate process so the API worker stays responsive.
-        process = multiprocessing.Process(target=run_training_sync, args=(force,), daemon=True)
-        process.start()
+        # Start training as an asyncio background task.
+        # This runs in the same event loop as the API — no multiprocessing needed.
+        # Azure App Service blocks fork(), so multiprocessing.Process silently fails.
+        asyncio.create_task(run_training_background(force))
         
         logger.info(f"Queued background training task (force={force})")
         
         return {
             "message": "Model training started",
             "status": "training",
-            "estimated_time_seconds": 45
+            "estimated_time_seconds": 120
         }
         
     except Exception as e:

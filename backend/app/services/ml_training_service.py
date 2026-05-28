@@ -95,7 +95,12 @@ class MLTrainingService:
             cache_days: Number of days before cache expires
         """
         if cache_dir is None:
-            cache_dir = Path(__file__).resolve().parent.parent.parent / "model_cache"
+            # Use /home on Azure (persistent), fallback to local path for dev
+            azure_home = Path("/home")
+            if azure_home.exists() and os.access(azure_home, os.W_OK):
+                cache_dir = azure_home / "quantfin" / "model_cache"
+            else:
+                cache_dir = Path(__file__).resolve().parent.parent.parent / "model_cache"
         
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)

@@ -187,3 +187,4 @@ cache/
 *.backup
 *.tmp
 .env
+.vercel

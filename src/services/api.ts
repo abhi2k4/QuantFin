@@ -198,17 +198,24 @@ export interface Recommendation {
 
 // Predicted vs Actual Types
 export interface PredictedVsActualResponse {
-  stocks: Array<{
-    symbol: string;
-    predicted_return: number;
-    actual_return: number;
-    error: number;
-    confidence: number;
-  }>;
-  overall_accuracy: number;
-  avg_error: number;
+  dates: string[];
+  actual_values: number[];
+  predicted_values: number[];
+  nifty50_values: number[];
   strategy: string;
-  period: string;
+  timeframe_days: number;
+  returns: {
+    actual: number;
+    predicted: number;
+    nifty50: number;
+    outperformance_vs_nifty: number;
+    prediction_accuracy: number;
+  };
+  final_values: {
+    actual: number;
+    predicted: number;
+    nifty50: number;
+  };
 }
 
 // Backtest Types

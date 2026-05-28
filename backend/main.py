@@ -45,6 +45,7 @@ allowed_origins = [
     "http://127.0.0.1:3000",
     "http://127.0.0.1:5173",
     "http://127.0.0.1:5174",
+    "https://quantfin.abhishekthormothe.in"
 ]
 
 # Add production frontend URL from environment variable
@@ -139,35 +140,11 @@ async def health():
 async def startup_event():
     """
     Executed when the application starts.
-    Initializes data preprocessing and loads data.
     """
     logger.info("=" * 60)
     logger.info("Starting QuantFin ETF Portfolio API")
     logger.info("=" * 60)
-    
-    try:
-        # Trigger data loading by accessing the preprocessor
-        from app.services.data_preprocessor import DataPreprocessor
-        from app.routers.predictions import initialize_prediction_services
-        preprocessor = DataPreprocessor()
-        
-        # Get available symbols to verify data loading
-        available_symbols = preprocessor.get_all_symbols()
-        logger.info(f"Found {len(available_symbols)} stock symbols available")
-        
-        if len(available_symbols) > 0:
-            logger.info(f"Sample symbols: {', '.join(available_symbols[:5])}")
-
-        # Initialize prediction services once data is available
-        initialize_prediction_services()
-        logger.info("Prediction services initialized successfully")
-        
-        logger.info("Data preprocessing initialized successfully")
-        
-    except Exception as e:
-        logger.error(f"Error during startup: {e}", exc_info=True)
-        logger.warning("API will start but data may not be available")
-    
+    logger.info("API is ready to accept requests")
     logger.info("=" * 60)
 
 

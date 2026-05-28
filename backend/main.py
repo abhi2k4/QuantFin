@@ -15,6 +15,7 @@ from fastapi.responses import JSONResponse
 from datetime import datetime
 import logging
 import time
+import os
 
 # from routers import sectors  # TODO: sectors router not yet implemented
 from app.routers import backtest, predictions, portfolio, analytics
@@ -36,16 +37,24 @@ app = FastAPI(
 )
 
 # Configure CORS
+# Allow localhost for development and production frontend URL
+allowed_origins = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+]
+
+# Add production frontend URL from environment variable
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    allowed_origins.append(frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:5174",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

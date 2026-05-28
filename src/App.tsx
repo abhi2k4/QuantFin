@@ -3,7 +3,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { IconLayoutDashboard, IconTrendingUp, IconBrain, IconMenu2, IconChartBar, IconBulb, IconCpu, IconX } from '@tabler/icons-react';
 import { Toaster } from 'sonner';
-import { SignedIn, SignedOut, UserButton } from '@/lib/clerk';
 
 // Pages
 import LandingPage   from '@/pages/LandingPage';
@@ -121,35 +120,26 @@ function App() {
               Contact
             </Link>
 
-            <SignedOut>
-              <Link
-                to="/signin"
-                className="hidden md:block"
-                style={{
-                  fontSize: '0.85rem',
-                  color: 'var(--text-secondary)',
-                  padding: '0.45rem 0.85rem',
-                  borderRadius: '6px',
-                  transition: 'color 0.2s',
-                }}
-              >
-                Sign in
-              </Link>
-              <Link
-                to="/signup"
-                className="btn-primary"
-                style={{ fontSize: '0.82rem', padding: '0.5rem 1.2rem' }}
-              >
-                Get started
-              </Link>
-            </SignedOut>
-
-            <SignedIn>
-              <UserButton
-                appearance={{ elements: { avatarBox: 'w-8 h-8' } }}
-                afterSignOutUrl="/"
-              />
-            </SignedIn>
+            <Link
+              to="/signin"
+              className="hidden md:block"
+              style={{
+                fontSize: '0.85rem',
+                color: 'var(--text-secondary)',
+                padding: '0.45rem 0.85rem',
+                borderRadius: '6px',
+                transition: 'color 0.2s',
+              }}
+            >
+              Sign in
+            </Link>
+            <Link
+              to="/signup"
+              className="btn-primary"
+              style={{ fontSize: '0.82rem', padding: '0.5rem 1.2rem' }}
+            >
+              Get started
+            </Link>
 
             {/* Mobile toggle */}
             <button
@@ -195,24 +185,22 @@ function App() {
                 );
               })}
               <div style={{ marginTop: '0.75rem', display: 'flex', gap: '0.5rem' }}>
-                <SignedOut>
-                  <Link
-                    to="/signin"
-                    onClick={() => setMobileOpen(false)}
-                    className="btn-secondary"
-                    style={{ flex: 1, justifyContent: 'center' }}
-                  >
-                    Sign in
-                  </Link>
-                  <Link
-                    to="/signup"
-                    onClick={() => setMobileOpen(false)}
-                    className="btn-primary"
-                    style={{ flex: 1, justifyContent: 'center' }}
-                  >
-                    Get started
-                  </Link>
-                </SignedOut>
+                <Link
+                  to="/signin"
+                  onClick={() => setMobileOpen(false)}
+                  className="btn-secondary"
+                  style={{ flex: 1, justifyContent: 'center' }}
+                >
+                  Sign in
+                </Link>
+                <Link
+                  to="/signup"
+                  onClick={() => setMobileOpen(false)}
+                  className="btn-primary"
+                  style={{ flex: 1, justifyContent: 'center' }}
+                >
+                  Get started
+                </Link>
               </div>
             </motion.div>
           )}

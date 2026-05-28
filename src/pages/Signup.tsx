@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { IconTrendingUp, IconArrowLeft, IconCircleCheckFilled } from '@tabler/icons-react';
-import { Link } from 'react-router-dom';
-import { SignUp } from '@/lib/clerk';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -17,6 +17,44 @@ const perks = [
 ];
 
 export default function Signup() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: formData.name, email: formData.email, password: formData.password }),
+      });
+
+      if (response.ok) {
+        navigate('/dashboard');
+      } else {
+        setError('Sign up failed');
+      }
+    } catch {
+      setError('Sign up failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <motion.div
       initial="hidden"
@@ -105,69 +143,123 @@ export default function Signup() {
               marginBottom: '2.5rem',
               transition: 'color 0.2s',
             }}
-            onMouseOver={e => (e.currentTarget.style.color = '#c8ff00')}
-            onMouseOut={e => (e.currentTarget.style.color = 'var(--text-muted)')}
           >
             <IconArrowLeft style={{ width: '14px', height: '14px' }} />
             Back to home
           </Link>
 
-          <h1
-            style={{
-              fontFamily: "'Space Grotesk', sans-serif",
-              fontWeight: 700,
-              fontSize: '1.75rem',
-              color: 'var(--text-primary)',
-              marginBottom: '0.5rem',
-            }}
-          >
+          <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: '1.75rem', color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
             Create account
           </h1>
           <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-            Already have an account?{' '}
-            <Link to="/signin" style={{ color: '#c8ff00', fontWeight: 500 }}>
-              Sign in
-            </Link>
+            Already have an account? <Link to="/signin" style={{ color: '#c8ff00', fontWeight: 500 }}>Sign in</Link>
           </p>
 
-          <SignUp
-            appearance={{
-              layout: { logoPlacement: 'none', showOptionalFields: false },
-              elements: {
-                rootBox: 'w-full',
-                card: 'bg-transparent shadow-none border-0 p-0 w-full',
-                headerTitle: 'hidden',
-                headerSubtitle: 'hidden',
-                socialButtonsBlockButton: [
-                  'w-full bg-transparent border border-white/10 text-white',
-                  'hover:bg-white/5 hover:border-white/20 rounded-lg h-11 text-sm font-medium',
-                  'transition-all duration-200'
-                ].join(' '),
-                dividerLine: 'bg-white/8',
-                dividerText: 'text-xs text-zinc-600',
-                formFieldLabel: 'text-zinc-400 text-sm mb-1',
-                formFieldInput: [
-                  'bg-zinc-900 border border-white/8 text-white rounded-lg h-11 px-4 text-sm',
-                  'focus:border-[#c8ff00]/50 focus:ring-2 focus:ring-[#c8ff00]/10',
-                  'placeholder:text-zinc-600 transition-all duration-200'
-                ].join(' '),
-                formButtonPrimary: [
-                  'w-full h-11 bg-[#c8ff00] text-black font-semibold rounded-lg text-sm',
-                  'hover:bg-[#d8ff33] transition-all duration-200',
-                  'focus:ring-2 focus:ring-[#c8ff00]/30'
-                ].join(' '),
-                footerActionLink: 'text-[#c8ff00] hover:text-[#d8ff33] font-medium',
-                identityPreviewEditButton: 'text-[#c8ff00]',
-                formFieldInputShowPasswordButton: 'text-zinc-500 hover:text-zinc-300',
-                alertText: 'text-sm',
-                formFieldErrorText: 'text-red-400 text-xs mt-1',
-              },
-            }}
-            routing="path"
-            path="/signup"
-            signInUrl="/signin"
-            afterSignUpUrl="/dashboard"
-          />
+          <form onSubmit={handleSignUp} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {error && <div style={{ padding: '0.75rem', background: 'rgba(255,0,0,0.1)', color: '#ff6b6b', borderRadius: '6px', fontSize: '0.85rem' }}>{error}</div>}
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Full Name</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="John Doe"
+                required
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  background: 'var(--bg-input)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '6px',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.9rem',
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="you@example.com"
+                required
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  background: 'var(--bg-input)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '6px',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.9rem',
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Password</label>
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+                required
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  background: 'var(--bg-input)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '6px',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.9rem',
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Confirm Password</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="••••••••"
+                required
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  background: 'var(--bg-input)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '6px',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.9rem',
+                }}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                background: '#c8ff00',
+                color: '#000',
+                border: 'none',
+                borderRadius: '6px',
+                fontWeight: 600,
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.6 : 1,
+              }}
+            >
+              {loading ? 'Creating account...' : 'Create account'}
+            </button>
+          </form>
         </div>
       </div>
     </motion.div>

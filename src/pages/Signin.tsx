@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { IconTrendingUp, IconArrowLeft } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
-import { SignIn } from '@/lib/clerk';
+import { useState } from 'react';
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -112,48 +112,93 @@ export default function Signin() {
           <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
             Don't have an account?{' '}
             <Link to="/signup" style={{ color: '#c8ff00', fontWeight: 500 }}>
-              Sign up free
+              Sign up
             </Link>
           </p>
 
-          <SignIn
-            appearance={{
-              layout: { logoPlacement: 'none', showOptionalFields: false },
-              elements: {
-                rootBox: 'w-full',
-                card: 'bg-transparent shadow-none border-0 p-0 w-full',
-                headerTitle: 'hidden',
-                headerSubtitle: 'hidden',
-                socialButtonsBlockButton: [
-                  'w-full bg-transparent border border-white/10 text-white',
-                  'hover:bg-white/5 hover:border-white/20 rounded-lg h-11 text-sm font-medium',
-                  'transition-all duration-200'
-                ].join(' '),
-                dividerLine: 'bg-white/8',
-                dividerText: 'text-xs text-zinc-600',
-                formFieldLabel: 'text-zinc-400 text-sm mb-1',
-                formFieldInput: [
-                  'bg-zinc-900 border border-white/8 text-white rounded-lg h-11 px-4 text-sm',
-                  'focus:border-[#c8ff00]/50 focus:ring-2 focus:ring-[#c8ff00]/10',
-                  'placeholder:text-zinc-600 transition-all duration-200'
-                ].join(' '),
-                formButtonPrimary: [
-                  'w-full h-11 bg-[#c8ff00] text-black font-semibold rounded-lg text-sm',
-                  'hover:bg-[#d8ff33] transition-all duration-200',
-                  'focus:ring-2 focus:ring-[#c8ff00]/30'
-                ].join(' '),
-                footerActionLink: 'text-[#c8ff00] hover:text-[#d8ff33] font-medium',
-                identityPreviewEditButton: 'text-[#c8ff00]',
-                formFieldInputShowPasswordButton: 'text-zinc-500 hover:text-zinc-300',
-                alertText: 'text-sm',
-                formFieldErrorText: 'text-red-400 text-xs mt-1',
-              },
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              alert('Signin form submitted. Implement your auth logic here.');
             }}
-            routing="path"
-            path="/signin"
-            signUpUrl="/signup"
-            afterSignInUrl="/dashboard"
-          />
+            style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+          >
+            <div>
+              <label style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>
+                Email
+              </label>
+              <input
+                type="email"
+                placeholder="your@email.com"
+                required
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '8px',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.9rem',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>
+                Password
+              </label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                required
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '8px',
+                  color: 'var(--text-primary)',
+                  fontSize: '0.9rem',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            <Link
+              to="#"
+              style={{
+                fontSize: '0.85rem',
+                color: '#c8ff00',
+                textDecoration: 'none',
+                textAlign: 'right',
+                marginTop: '-0.5rem',
+              }}
+            >
+              Forgot password?
+            </Link>
+
+            <button
+              type="submit"
+              style={{
+                width: '100%',
+                padding: '0.75rem 1rem',
+                background: '#c8ff00',
+                color: '#000',
+                border: 'none',
+                borderRadius: '8px',
+                fontWeight: 600,
+                fontSize: '0.9rem',
+                cursor: 'pointer',
+                transition: 'background 0.2s',
+                marginTop: '0.5rem',
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.background = '#d8ff33')}
+              onMouseOut={(e) => (e.currentTarget.style.background = '#c8ff00')}
+            >
+              Sign in
+            </button>
+          </form>
         </div>
       </div>
     </motion.div>

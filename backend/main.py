@@ -141,11 +141,7 @@ async def startup_event():
     """
     Executed when the application starts.
     """
-    logger.info("=" * 60)
-    logger.info("Starting QuantFin ETF Portfolio API")
-    logger.info("=" * 60)
-    logger.info("API is ready to accept requests")
-    logger.info("=" * 60)
+    pass
 
 
 # Shutdown event

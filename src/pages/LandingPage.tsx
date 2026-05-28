@@ -46,7 +46,7 @@ export default function LandingPage() {
             <motion.div variants={fadeUp}>
               <span className="hero-badge">
                 <span className="pulse-dot" />
-                AI-Powered Portfolio Intelligence
+                ML-Powered Portfolio Intelligence
               </span>
             </motion.div>
 
@@ -56,7 +56,7 @@ export default function LandingPage() {
               style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', marginBottom: '1.25rem', color: 'var(--text-primary)' }}
             >
               Smarter investing,<br />
-              <span style={{ color: '#c8ff00', fontWeight: 700 }}>powered by AI</span>
+              <span style={{ color: '#c8ff00', fontWeight: 700 }}>powered by ML</span>
             </motion.h1>
 
             <motion.p

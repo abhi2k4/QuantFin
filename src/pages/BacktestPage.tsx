@@ -25,7 +25,7 @@ export default function BacktestPage() {
   // Backtest configuration
   const [strategy, setStrategy] = useState<string>('LINEAR');
   const [startDate, setStartDate] = useState<string>('2023-01-01');
-  const [endDate, setEndDate] = useState<string>('2024-12-31');
+  const [endDate, setEndDate] = useState<string>('2026-03-31');
   const [capital, setCapital] = useState<number>(100000);
   const [topN, setTopN] = useState<number>(10);
   const [rebalanceFreq, setRebalanceFreq] = useState<string>('monthly');

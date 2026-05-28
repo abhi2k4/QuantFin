@@ -30,7 +30,8 @@ import {
   type Position,
   type RebalanceRequest,
   type AllocationRecommendation,
-  type StrategyComparisonResponse
+  type StrategyComparisonResponse,
+  type PredictedVsActualResponse
 } from '@/services/api';
 import { toast } from 'sonner';
 
@@ -72,12 +73,6 @@ export default function Dashboard() {
     setLoadingSummary(true);
     try {
       const data = await getPortfolioSummary(signal);
-      // Calculate allocations
-      const totalValue = data.positions.reduce((sum, pos) => sum + (pos.quantity * pos.current_price), 0);
-      data.positions = data.positions.map(pos => ({
-        ...pos,
-        allocation: ((pos.quantity * pos.current_price) / totalValue) * 100
-      }));
       setSummary(data);
     } catch (error) {
       if (signal?.aborted || (error as { code?: string; name?: string })?.code === 'ERR_CANCELED' || (error as { code?: string; name?: string })?.name === 'CanceledError') {
@@ -219,14 +214,12 @@ export default function Dashboard() {
     }
   };
 
-  const sortedPositions = summary?.positions.sort((a, b) => {
-    const aValue = a[sortKey] || 0;
-    const bValue = b[sortKey] || 0;
-    if (sortOrder === 'asc') {
-      return aValue < bValue ? -1 : 1;
-    } else {
-      return aValue > bValue ? -1 : 1;
-    }
+  const sortedPositions = summary?.positions.slice().sort((a, b) => {
+    const aValue = a[sortKey];
+    const bValue = b[sortKey];
+    if (aValue === bValue) return 0;
+    const cmp = aValue < bValue ? -1 : 1;
+    return sortOrder === 'asc' ? cmp : -cmp;
   }) || [];
 
   return (
@@ -260,7 +253,7 @@ export default function Dashboard() {
                   void loadPortfolioPerformance(timeframe);
                   void loadStrategyComparison(timeframe);
                 }}
-                className="rounded-xl bg-[#1a1a1a] hover:bg-[#222] border border-[rgba(255,255,255,0.07)]"
+                className="rounded-xl bg-[#1a1a1a] hover:bg-[#222] border border-[rgba(255,255,255,0.07)] text-gray-200 hover:text-white"
               >
                 <IconRefresh className="w-4 h-4 mr-2" />
                 Refresh
@@ -793,8 +786,10 @@ function PerformanceChart({ data, timeframe, onTimeframeChange, loading }: Perfo
                   border: '1px solid rgba(255,255,255,0.08)',
                   borderRadius: '12px',
                   backdropFilter: 'blur(20px)',
-                  padding: '12px'
+                  padding: '12px',
+                  color: '#e5e7eb'
                 }}
+                itemStyle={{ color: '#e5e7eb' }}
                 labelStyle={{ color: '#fff', marginBottom: '8px', fontWeight: 'bold' }}
                 formatter={(value: number, name: string, props: any) => {
                   if (name === 'value') {
@@ -896,8 +891,11 @@ function AllocationChart({ positions, loading }: AllocationChartProps) {
                 contentStyle={{
                   backgroundColor: '#0d0d0d',
                   border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '12px'
+                  borderRadius: '12px',
+                  color: '#e5e7eb'
                 }}
+                itemStyle={{ color: '#e5e7eb' }}
+                labelStyle={{ color: '#fff', fontWeight: 600 }}
                 formatter={(value: number) => `${value.toFixed(2)}%`}
               />
             </PieChart>

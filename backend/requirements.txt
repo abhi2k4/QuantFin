@@ -24,5 +24,6 @@ alembic==1.13.1
 python-dotenv==1.0.0
 xgboost==2.0.3
 statsmodels==0.14.1
-tensorflow==2.15.0
+# tensorflow removed: ~500MB install causes 15+ min deploys & OOM on Azure Free (F1) tier.
+# LSTM automatically falls back to LinearRegression when tensorflow is unavailable.
 aiohttp==3.8.4
